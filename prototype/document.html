@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitPulse — Documento Completo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* ── Variables ── */
+:root {
+  --primary: #FF4D00;
+  --accent: #00D4AA;
+  --warning: #FFB800;
+  --danger: #FF4757;
+  --purple: #8A2BE2;
+  --bg: #FFFFFF;
+  --bg-subtle: #F8F8FA;
+  --bg-code: #F1F1F5;
+  --text: #1A1A2E;
+  --text-secondary: #555570;
+  --text-muted: #9090A8;
+  --border: #E4E4EE;
+  --border-strong: #C8C8DC;
+  --shadow: 0 2px 12px rgba(0,0,0,.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F0F0F5;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 52px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 32px;
+  gap: 20px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.05);
+}
+.toolbar-logo {
+  font-size: 18px; font-weight: 800;
+  background: linear-gradient(135deg, #FF4D00, #FF6B2B);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-right: 16px;
+}
+.toolbar-sep { width: 1px; height: 24px; background: var(--border); }
+.toolbar-label { font-size: 13px; color: var(--text-secondary); }
+.toolbar-spacer { flex: 1; }
+.toolbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all .15s;
+}
+.tb-primary { background: var(--primary); color: #fff; }
+.tb-primary:hover { background: #e04400; }
+.tb-ghost { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
+.tb-ghost:hover { background: var(--border); }
+.toolbar-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* ── Document ── */
+.doc-wrap {
+  max-width: 900px; margin: 72px auto 60px;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--border), var(--shadow);
+  border-radius: 4px;
+}
+
+/* Cover page */
+.doc-cover {
+  padding: 80px 80px 60px;
+  border-bottom: 3px solid var(--primary);
+  background: linear-gradient(160deg, #fff 60%, #FFF8F5 100%);
+  position: relative;
+  overflow: hidden;
+}
+.doc-cover::after {
+  content: '';
+  position: absolute; top: -80px; right: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,77,0,.06) 0%, transparent 70%);
+}
+.cover-brand {
+  font-size: 14px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 3px; margin-bottom: 28px;
+}
+.cover-title {
+  font-size: 44px; font-weight: 900; letter-spacing: -1.5px;
+  line-height: 1.1; color: var(--text); margin-bottom: 16px;
+}
+.cover-title span { color: var(--primary); }
+.cover-subtitle {
+  font-size: 18px; color: var(--text-secondary);
+  max-width: 560px; line-height: 1.6; margin-bottom: 40px;
+}
+.cover-meta-row {
+  display: flex; gap: 40px; border-top: 1px solid var(--border);
+  padding-top: 24px; margin-top: 8px;
+}
+.cover-meta-item .label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+.cover-meta-item .value { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+/* ── Document body ── */
+.doc-body { padding: 0 80px 80px; }
+
+/* TOC */
+.toc {
+  padding: 40px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.toc h2 { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+.toc-list { list-style: none; columns: 2; gap: 0; }
+.toc-list li { margin-bottom: 6px; }
+.toc-list a {
+  font-size: 14px; color: var(--text-secondary); text-decoration: none;
+  display: flex; align-items: center; gap: 8px; transition: color .15s;
+}
+.toc-list a:hover { color: var(--primary); }
+.toc-list .num { font-size: 11px; font-weight: 700; color: var(--text-muted); min-width: 24px; }
+.toc-list .page { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+
+/* Section */
+.doc-section { margin-bottom: 56px; scroll-margin-top: 80px; }
+.section-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--primary);
+  background: rgba(255,77,0,.08); padding: 3px 10px; border-radius: 4px;
+  margin-bottom: 10px;
+}
+.section-tag.green { color: var(--accent); background: rgba(0,212,170,.08); }
+.doc-h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 12px; }
+.doc-h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin: 32px 0 12px; }
+.doc-h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+.doc-lead {
+  font-size: 17px; color: var(--text-secondary); line-height: 1.7;
+  border-left: 3px solid var(--primary); padding-left: 16px; margin-bottom: 24px;
+}
+p { font-size: 15px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.7; }
+.doc-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+/* Callout */
+.callout {
+  padding: 18px 20px; border-radius: 10px; margin: 20px 0;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.callout p { margin: 0; font-size: 14px; }
+.callout-orange { background: rgba(255,77,0,.06); border-left: 3px solid var(--primary); }
+.callout-green  { background: rgba(0,212,170,.06); border-left: 3px solid var(--accent); }
+.callout-yellow { background: rgba(255,184,0,.06); border-left: 3px solid var(--warning); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+th { background: var(--bg-subtle); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border); }
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+tr:hover td { background: var(--bg-subtle); }
+td strong { color: var(--text); }
+
+/* Cards */
+.card-grid { display: grid; gap: 16px; margin: 16px 0; }
+.cg-2 { grid-template-columns: 1fr 1fr; }
+.cg-3 { grid-template-columns: repeat(3,1fr); }
+.cg-4 { grid-template-columns: repeat(4,1fr); }
+.info-card {
+  padding: 18px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.info-card .ic-icon { font-size: 22px; margin-bottom: 8px; }
+.info-card .ic-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.info-card .ic-value { font-size: 20px; font-weight: 800; color: var(--text); }
+.info-card .ic-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Badge */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+.badge-red    { background: rgba(255,77,0,.1); color: var(--primary); }
+.badge-green  { background: rgba(0,212,170,.1); color: var(--accent); }
+.badge-yellow { background: rgba(255,184,0,.1); color: var(--warning); }
+.badge-purple { background: rgba(138,43,226,.1); color: var(--purple); }
+
+/* Lists */
+ul.doc-list { margin: 0 0 16px 0; padding-left: 0; list-style: none; }
+ul.doc-list li { padding: 5px 0 5px 20px; position: relative; font-size: 14px; color: var(--text-secondary); }
+ul.doc-list li::before { content: '→'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+
+/* ── Gantt ── */
+.gantt-section { margin: 24px 0; }
+.gantt-scroll { overflow-x: auto; }
+.gantt-scroll::-webkit-scrollbar { height: 4px; }
+.gantt-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.gantt-tbl { border-collapse: collapse; min-width: 100%; font-size: 12px; }
+.gantt-tbl th {
+  font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  padding: 6px 2px; text-align: center; border-bottom: 2px solid var(--border);
+  min-width: 38px; white-space: nowrap; background: var(--bg-subtle);
+}
+.gantt-tbl th:first-child { text-align: left; min-width: 180px; padding-left: 4px; }
+.gantt-tbl tr.g-section td {
+  padding: 10px 4px 4px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text-muted); background: #fff;
+}
+.gantt-tbl td { padding: 2px 2px; border-bottom: 1px solid rgba(228,228,238,.5); }
+.gantt-tbl td:first-child { font-size: 12px; color: var(--text-secondary); padding-left: 4px; white-space: nowrap; }
+.g-cell { height: 20px; position: relative; border-left: 1px solid rgba(228,228,238,.6); }
+.g-bar {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 3px; left: 1px; right: 1px;
+  display: flex; align-items: center; padding: 0 6px;
+  font-size: 9px; font-weight: 700; color: rgba(255,255,255,.9);
+  white-space: nowrap; overflow: hidden;
+}
+
+/* Phase timeline */
+.phase-timeline {
+  display: flex; gap: 0; margin: 24px 0; border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+.phase-block {
+  flex: 1; padding: 14px 16px; border-right: 1px solid var(--border);
+  position: relative;
+}
+.phase-block:last-child { border-right: none; }
+.pb-num { font-size: 11px; font-weight: 800; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.pb-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.pb-dur { font-size: 11px; color: var(--text-muted); }
+.pb-inv { font-size: 12px; font-weight: 700; margin-top: 6px; }
+
+/* Financial summary */
+.fin-row {
+  display: grid; grid-template-columns: 120px 1fr 1fr 1fr;
+  gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.fin-row:last-child { border: none; font-weight: 700; background: var(--bg-subtle); padding: 12px 8px; border-radius: 8px; }
+.fin-bar-track { height: 6px; background: var(--bg-code); border-radius: 3px; overflow: hidden; }
+.fin-bar-fill { height: 100%; border-radius: 3px; }
+
+/* ── Print styles ── */
+@media print {
+  .toolbar { display: none !important; }
+  body { background: #fff; }
+  .doc-wrap { margin: 0; box-shadow: none; border-radius: 0; max-width: 100%; }
+  .doc-body { padding: 0 60px 60px; }
+  .doc-cover { padding: 60px; }
+  .doc-section { page-break-inside: avoid; }
+  .doc-h1 { page-break-before: always; }
+  .doc-h1:first-of-type { page-break-before: avoid; }
+  a { color: inherit !important; }
+  .callout-orange, .callout-green, .callout-yellow { border-left-width: 3px !important; }
+  .gantt-scroll { overflow: visible; }
+  .gantt-tbl { font-size: 9px; }
+  .phase-timeline { page-break-inside: avoid; }
+  @page { margin: 20mm; size: A4; }
+}
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-logo">FitPulse</div>
+  <div class="toolbar-sep"></div>
+  <div class="toolbar-label">Visão de Produto & Plano de Atuação — v1.0</div>
+  <div class="toolbar-spacer"></div>
+  <a href="presentation.html" class="toolbar-btn tb-ghost">
+    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3l5 4-5 4V6z"/></svg>
+    Apresentação
+  </a>
+  <button class="toolbar-btn tb-primary" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+    Salvar como PDF
+  </button>
+</div>
+
+<div class="doc-wrap">
+
+  <!-- Cover -->
+  <div class="doc-cover">
+    <div class="cover-brand">FitPulse — Documento Estratégico</div>
+    <div class="cover-title">Visão de Produto<br><span>&amp; Plano de Atuação</span></div>
+    <div class="cover-subtitle">Plataforma fitness dual-sided que conecta atletas engajados a marcas esportivas através de dados comportamentais reais, comunidade e eventos.</div>
+    <div class="cover-meta-row">
+      <div class="cover-meta-item"><div class="label">Versão</div><div class="value">1.0</div></div>
+      <div class="cover-meta-item"><div class="label">Data</div><div class="value">Março 2026</div></div>
+      <div class="cover-meta-item"><div class="label">Status</div><div class="value">Pré-seed / Discovery</div></div>
+      <div class="cover-meta-item"><div class="label">Horizonte</div><div class="value">20 meses</div></div>
+      <div class="cover-meta-item"><div class="label">Mercado Alvo</div><div class="value">Brasil → LatAm</div></div>
+    </div>
+  </div>
+
+  <div class="doc-body">
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>Índice</h2>
+      <ul class="toc-list">
+        <li><a href="#s-problema"><span class="num">01</span>Problema</a></li>
+        <li><a href="#s-solucao"><span class="num">02</span>Solução e Posicionamento</a></li>
+        <li><a href="#s-publico"><span class="num">03</span>Público-Alvo</a></li>
+        <li><a href="#s-features"><span class="num">04</span>Funcionalidades</a></li>
+        <li><a href="#s-mono"><span class="num">05</span>Monetização</a></li>
+        <li><a href="#s-tech"><span class="num">06</span>Stack Tecnológico</a></li>
+        <li><a href="#s-plano"><span class="num">07</span>Plano de Atuação</a></li>
+        <li><a href="#s-gantt"><span class="num">08</span>Gantt — Cronograma</a></li>
+        <li><a href="#s-financeiro"><span class="num">09</span>Resumo Financeiro</a></li>
+        <li><a href="#s-metricas"><span class="num">10</span>Métricas de Sucesso</a></li>
+        <li><a href="#s-riscos"><span class="num">11</span>Riscos e Mitigações</a></li>
+        <li><a href="#s-30dias"><span class="num">12</span>Primeiros 30 Dias</a></li>
+      </ul>
+    </div>
+
+    <!-- ══ 01 PROBLEMA ══ -->
+    <div class="doc-section" id="s-problema">
+      <div class="section-tag">01 · Problema</div>
+      <div class="doc-h1">O problema é fragmentação</div>
+      <div class="doc-lead">Dados, comunidade, eventos e benefícios fitness existem em silos separados — tanto para usuários quanto para empresas.</div>
+
+      <div class="doc-h2">Para o Atleta (B2C)</div>
+      <ul class="doc-list">
+        <li>Dados de treino fragmentados entre múltiplos apps e dispositivos (Garmin aqui, Strava ali, academia em outro lugar)</li>
+        <li>Nenhuma plataforma une treino + saúde + comunidade + eventos + benefícios de marcas em um só lugar</li>
+        <li>Strava é limitado ao registro de atividade; redes sociais genéricas não entendem o contexto esportivo</li>
+        <li>Difícil descobrir eventos esportivos, produtos e serviços relevantes para o perfil de atleta</li>
+      </ul>
+
+      <div class="doc-h2">Para a Empresa (B2B)</div>
+      <ul class="doc-list">
+        <li>Marcas esportivas pagam mídia genérica sem atingir público nichado e engajado</li>
+        <li>Falta de dados comportamentais reais de atletas (apenas dados declarados)</li>
+        <li>Impossível medir ROI de patrocínios, eventos e campanhas no universo fitness</li>
+        <li>Organizadores de eventos não têm ferramentas integradas de engajamento pré/durante/pós evento</li>
+      </ul>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 02 SOLUÇÃO ══ -->
+    <div class="doc-section" id="s-solucao">
+      <div class="section-tag">02 · Solução</div>
+      <div class="doc-h1">FitPulse preenche o gap</div>
+      <div class="doc-lead">Uma plataforma dual-sided que centraliza a vida fitness do usuário e oferece às marcas acesso a um público nichado com dados reais.</div>
+
+      <div class="callout callout-orange">
+        <span class="callout-icon">⚡</span>
+        <p><strong>FitPulse = Strava (social) + Garmin (dados) + Wellhub (benefícios) + Yazo (eventos)</strong> em uma plataforma única com camada B2B de analytics e monetização.</p>
+      </div>
+
+      <div class="doc-h2">Análise Competitiva</div>
+      <table>
+        <thead><tr><th>Plataforma</th><th>Tracking</th><th>Social</th><th>Dashboard B2B</th><th>Eventos</th><th>Benefícios</th><th>Dados Saúde</th></tr></thead>
+        <tbody>
+          <tr style="background:rgba(255,77,0,.03)"><td><strong>FitPulse ✦</strong></td><td><span class="badge badge-green">✓ Sim</span></td><td><span class="badge badge-green">✓ Sim</span></td><td><span class="badge badge-green">✓ Sim</span></td><td><span class="badge badge-green">✓ Sim</span></td><td><span class="badge badge-green">✓ Sim</span></td><td><span class="badge badge-green">✓ Sim</span></td></tr>
+          <tr><td>Strava</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Parcial</span></td><td>—</td><td>—</td><td><span class="badge badge-yellow">Parcial</span></td></tr>
+          <tr><td>Garmin Connect</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Parcial</span></td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-green">✓</span></td></tr>
+          <tr><td>Wellhub (Gympass)</td><td>—</td><td>—</td><td><span class="badge badge-green">✓</span></td><td>—</td><td><span class="badge badge-green">✓</span></td><td>—</td></tr>
+          <tr><td>Adidas Running</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Parcial</span></td><td>—</td><td>—</td><td><span class="badge badge-yellow">Parcial</span></td><td><span class="badge badge-yellow">Parcial</span></td></tr>
+          <tr><td>Runna</td><td><span class="badge badge-yellow">Parcial</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-yellow">Parcial</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 03 PÚBLICO ══ -->
+    <div class="doc-section" id="s-publico">
+      <div class="section-tag">03 · Público-Alvo</div>
+      <div class="doc-h1">Personas B2C e B2B</div>
+
+      <div class="doc-h2">B2C — Atletas</div>
+      <table>
+        <thead><tr><th>Persona</th><th>Perfil</th><th>Necessidade Principal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>🏃 Corredor Recreativo</strong></td><td>25-45 anos, corre 3-4x/semana, relógio GPS</td><td>Registrar treinos, compartilhar conquistas, encontrar eventos</td></tr>
+          <tr><td><strong>🏋️ Atleta de Academia</strong></td><td>20-40 anos, musculação/funcional, smartwatch</td><td>Acompanhar evolução, comunidade motivacional, descontos</td></tr>
+          <tr><td><strong>👥 Esportista Social</strong></td><td>25-50 anos, pratica em grupo, eventos</td><td>Comunidade, calendário de eventos, fotos e experiências</td></tr>
+          <tr><td><strong>⚡ Atleta de Performance</strong></td><td>20-45 anos, compete em provas, dados avançados</td><td>Métricas profundas, planos de treino, preparação para provas</td></tr>
+        </tbody>
+      </table>
+
+      <div class="doc-h2">B2B — Empresas</div>
+      <table>
+        <thead><tr><th>Persona</th><th>Perfil</th><th>Necessidade Principal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>👟 Marca Esportiva</strong></td><td>Nike, Adidas, New Balance, marcas regionais</td><td>Alcançar público nichado com ROI mensurável</td></tr>
+          <tr><td><strong>🎫 Organizador de Eventos</strong></td><td>Produtoras de corridas, maratonas, trilhas</td><td>Inscrição + engajamento + dados pós-evento</td></tr>
+          <tr><td><strong>💊 Suplementos/Nutrição</strong></td><td>Growth, Integral Médica, marcas DTC</td><td>Atingir atletas com perfil de consumo comprovado</td></tr>
+          <tr><td><strong>🏢 Academias/Estúdios</strong></td><td>Redes e independentes</td><td>Aquisição e retenção de clientes via comunidade</td></tr>
+          <tr><td><strong>🏥 Planos de Saúde</strong></td><td>Operadoras buscando prevenção</td><td>Dados de atividade para programas de incentivo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 04 FEATURES ══ -->
+    <div class="doc-section" id="s-features">
+      <div class="section-tag">04 · Funcionalidades</div>
+      <div class="doc-h1">Funcionalidades Core</div>
+
+      <div class="doc-h2">App do Usuário (B2C)</div>
+      <div class="doc-h3">Registro de Atividades</div>
+      <ul class="doc-list">
+        <li>Tracking GPS nativo (corrida, ciclismo, caminhada, trilha)</li>
+        <li>Registro manual de treinos de academia, natação, funcional</li>
+        <li>Sync automático com wearables: Garmin, Apple Watch, Samsung, COROS, Polar, Amazfit, Whoop</li>
+        <li>Importação via Health Connect (Android) e HealthKit (iOS)</li>
+        <li>Importação de arquivos .FIT, .GPX, .TCX</li>
+        <li>Métricas: distância, pace, FC, elevação, calorias, zonas de FC, cadência</li>
+      </ul>
+      <div class="doc-h3">Dashboard de Saúde</div>
+      <ul class="doc-list">
+        <li>Visão consolidada: sono, HRV, estresse, VO2max, peso, FC repouso</li>
+        <li>Body Score diário — score unificado baseado em sono + HRV + atividade</li>
+        <li>Tendências semanais/mensais com insights simples</li>
+      </ul>
+      <div class="doc-h3">Feed Social</div>
+      <ul class="doc-list">
+        <li>Feed cronológico de atividades da rede (estilo Strava)</li>
+        <li>Posts de texto/foto/vídeo, kudos, comentários, compartilhamento</li>
+        <li>Posts patrocinados de marcas (native ads) integrados ao feed</li>
+        <li>Stories de eventos e desafios</li>
+      </ul>
+      <div class="doc-h3">Comunidade & Gamificação</div>
+      <ul class="doc-list">
+        <li>Clubes/grupos por modalidade, cidade, nível</li>
+        <li>Desafios semanais/mensais com badges e rankings</li>
+        <li>Leaderboards (geral, amigos, clube, cidade)</li>
+        <li>Programa de pontos FitCoins por atividade, engajamento e participação</li>
+        <li>Streaks (sequências de dias ativos)</li>
+      </ul>
+      <div class="doc-h3">Eventos</div>
+      <ul class="doc-list">
+        <li>Calendário de eventos esportivos (corridas, maratonas, trilhas, competições)</li>
+        <li>Inscrição integrada com pagamento via PIX e cartão</li>
+        <li>Engajamento pré/durante/pós evento com resultados e certificados digitais</li>
+      </ul>
+
+      <div class="doc-h2">Dashboard B2B (Empresas)</div>
+      <div class="doc-h3">Publicação e Campanhas</div>
+      <ul class="doc-list">
+        <li>Posts patrocinados com segmentação avançada: modalidade, frequência, localização, faixa etária</li>
+        <li>Desafios patrocinados e gestão de cupons na área de membros</li>
+      </ul>
+      <div class="doc-h3">Analytics & ROI</div>
+      <ul class="doc-list">
+        <li>Dashboard em tempo real: impressões, engajamento, conversão</li>
+        <li>ROI calculado: investimento vs. cupons resgatados vs. compras</li>
+        <li>Relatórios exportáveis PDF/CSV e infográficos automáticos</li>
+        <li>Benchmarks contra médias da plataforma</li>
+      </ul>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 05 MONETIZAÇÃO ══ -->
+    <div class="doc-section" id="s-mono">
+      <div class="section-tag">05 · Monetização</div>
+      <div class="doc-h1">Modelo de Receita</div>
+
+      <div class="doc-h2">B2C — Usuários</div>
+      <table>
+        <thead><tr><th>Tier</th><th>Modelo</th><th>Ticket</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Free</strong></td><td>Tracking, feed, comunidade básica</td><td>R$ 0</td></tr>
+          <tr><td><strong>Pro</strong></td><td>Analytics avançados, Body Score, FitCoins boost</td><td>R$ 19,90/mês · R$ 149,90/ano</td></tr>
+          <tr><td><strong>Eventos</strong></td><td>Comissão sobre inscrições</td><td>8–12%</td></tr>
+          <tr><td><strong>Marketplace</strong></td><td>Comissão sobre vendas/cupons</td><td>10–20%</td></tr>
+        </tbody>
+      </table>
+
+      <div class="doc-h2">B2B — Empresas</div>
+      <table>
+        <thead><tr><th>Tier</th><th>Descrição</th><th>Ticket</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Starter</strong></td><td>Self-service: posts patrocinados, cupons</td><td>R$ 500–2.000/mês</td></tr>
+          <tr><td><strong>Pro</strong></td><td>Campanhas segmentadas, desafios, analytics</td><td>R$ 5.000–20.000/mês</td></tr>
+          <tr><td><strong>Enterprise</strong></td><td>Dashboard completo, dados de mercado, API</td><td>R$ 20.000–100.000/mês</td></tr>
+          <tr><td><strong>Eventos</strong></td><td>Plataforma de gestão + comissão de inscrição</td><td>R$ 2.000 fixo + 8–12%</td></tr>
+          <tr><td><strong>Data Insights</strong></td><td>Relatórios agregados e anonimizados por demanda</td><td>R$ 10.000–50.000/relatório</td></tr>
+        </tbody>
+      </table>
+
+      <div class="doc-h2">Projeção de MRR</div>
+      <div class="card-grid cg-4">
+        <div class="info-card"><div class="ic-label">Mês 6 — MVP</div><div class="ic-value">R$ 30K</div><div class="ic-sub">10K usuários · 10 B2B</div></div>
+        <div class="info-card"><div class="ic-label">Mês 12 — Tração</div><div class="ic-value">R$ 150K</div><div class="ic-sub">50K usuários · 50 B2B</div></div>
+        <div class="info-card"><div class="ic-label">Mês 18 — Scale</div><div class="ic-value">R$ 500K</div><div class="ic-sub">150K usuários · 150 B2B</div></div>
+        <div class="info-card" style="border-color:rgba(255,77,0,.2)"><div class="ic-label">Mês 24 — LatAm</div><div class="ic-value" style="color:var(--primary)">R$ 2M</div><div class="ic-sub">500K usuários · 500 B2B</div></div>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 06 STACK ══ -->
+    <div class="doc-section" id="s-tech">
+      <div class="section-tag">06 · Tecnologia</div>
+      <div class="doc-h1">Stack Tecnológico</div>
+      <table>
+        <thead><tr><th>Camada</th><th>Tecnologia</th><th>Justificativa</th></tr></thead>
+        <tbody>
+          <tr><td>Mobile</td><td><strong>React Native (Expo)</strong></td><td>Cross-platform iOS + Android, time único, ecossistema maduro</td></tr>
+          <tr><td>Web / B2B</td><td><strong>Next.js + React</strong></td><td>SSR, performance, reutiliza componentes com mobile</td></tr>
+          <tr><td>Backend / API</td><td><strong>NestJS + Go</strong></td><td>NestJS para features; Go para ingestão de dados de alta performance</td></tr>
+          <tr><td>Banco de Dados</td><td><strong>PostgreSQL + TimescaleDB</strong></td><td>Relacional + time-series otimizado para dados de atividade</td></tr>
+          <tr><td>Cache / Realtime</td><td><strong>Redis</strong></td><td>Sessões, feeds, leaderboards em tempo real</td></tr>
+          <tr><td>Filas / Eventos</td><td><strong>Kafka / RabbitMQ</strong></td><td>Sync assíncrono de wearables e pipelines de analytics</td></tr>
+          <tr><td>Analytics / BI</td><td><strong>ClickHouse</strong></td><td>Processamento analítico de grande volume para dashboard B2B</td></tr>
+          <tr><td>Storage</td><td><strong>AWS S3 / Cloudflare R2</strong></td><td>Fotos, GPX files, relatórios exportados</td></tr>
+          <tr><td>Infraestrutura</td><td><strong>AWS + Vercel</strong></td><td>Auto-scaling, CDN global, serverless onde possível</td></tr>
+          <tr><td>Integrações</td><td><strong>HealthKit + Health Connect</strong></td><td>Cobertura nativa iOS/Android para todos os wearables</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 07 PLANO ══ -->
+    <div class="doc-section" id="s-plano">
+      <div class="section-tag">07 · Plano de Atuação</div>
+      <div class="doc-h1">Roadmap de 20 Meses</div>
+      <div class="doc-lead">5 fases progressivas — do discovery à expansão LatAm — com marcos claros de validação.</div>
+
+      <div class="phase-timeline">
+        <div class="phase-block" style="background:#FFF8F5">
+          <div class="pb-num" style="background:#FF4D00">0</div>
+          <div class="pb-title">Discovery</div>
+          <div class="pb-dur">Meses 1–2</div>
+          <div class="pb-inv" style="color:var(--primary)">R$ 50K</div>
+        </div>
+        <div class="phase-block" style="background:#FFF5F0">
+          <div class="pb-num" style="background:#FF4D00">1</div>
+          <div class="pb-title">MVP B2C</div>
+          <div class="pb-dur">Meses 3–6</div>
+          <div class="pb-inv" style="color:var(--primary)">R$ 250K</div>
+        </div>
+        <div class="phase-block" style="background:#FFFBF0">
+          <div class="pb-num" style="background:#FFB800">2</div>
+          <div class="pb-title">Growth + B2B</div>
+          <div class="pb-dur">Meses 7–10</div>
+          <div class="pb-inv" style="color:var(--warning)">R$ 500K</div>
+        </div>
+        <div class="phase-block" style="background:#F0FEFA">
+          <div class="pb-num" style="background:#00D4AA">3</div>
+          <div class="pb-title">Scale</div>
+          <div class="pb-dur">Meses 11–14</div>
+          <div class="pb-inv" style="color:var(--accent)">R$ 900K</div>
+        </div>
+        <div class="phase-block" style="background:#F8F5FF">
+          <div class="pb-num" style="background:#8A2BE2">4</div>
+          <div class="pb-title">LatAm</div>
+          <div class="pb-dur">Meses 15–20</div>
+          <div class="pb-inv" style="color:var(--purple)">R$ 3M</div>
+        </div>
+      </div>
+
+      <div class="doc-h2">Fase 0 — Discovery &amp; Design (Meses 1–2)</div>
+      <p><strong>Objetivo:</strong> Validar hipóteses, definir escopo do MVP, montar time core.</p>
+      <table>
+        <thead><tr><th>Semana</th><th>Atividade</th><th>Entrega</th></tr></thead>
+        <tbody>
+          <tr><td>1–2</td><td>Pesquisa com usuários</td><td>20+ entrevistas com corredores, atletas de academia, organizadores</td></tr>
+          <tr><td>1–2</td><td>Análise competitiva</td><td>Mapa de features vs concorrentes, gaps confirmados</td></tr>
+          <tr><td>2–3</td><td>Personas e jornadas</td><td>User journeys documentados para cada persona core</td></tr>
+          <tr><td>3–5</td><td>Wireframes e protótipos</td><td>Figma com fluxos completos do MVP</td></tr>
+          <tr><td>5–6</td><td>Testes de usabilidade</td><td>10+ sessões, NPS &gt; 40</td></tr>
+          <tr><td>6–8</td><td>Definição técnica + time</td><td>Arquitetura, stack, contratos de desenvolvimento</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">🎯</span>
+        <p><strong>Marcos:</strong> 80%+ dos entrevistados confirmam dor de fragmentação · 70%+ interesse em benefícios de marcas · Protótipo com NPS &gt; 40</p>
+      </div>
+
+      <div class="doc-h2">Fase 1 — MVP B2C Core (Meses 3–6)</div>
+      <p><strong>Objetivo:</strong> Lançar app funcional com tracking + social + comunidade para corredores em SP e RJ.</p>
+      <div class="doc-h3">Sprint Plan (2 semanas por sprint)</div>
+      <table>
+        <thead><tr><th>Sprint</th><th>Foco</th><th>Entregas</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Setup &amp; Auth</td><td>Infra AWS, CI/CD, banco, autenticação, onboarding</td></tr>
+          <tr><td>2</td><td>Perfil &amp; Tracking</td><td>Perfil do atleta, GPS tracking, tela de atividade</td></tr>
+          <tr><td>3</td><td>Integrações</td><td>Garmin Connect sync, HealthKit, Health Connect</td></tr>
+          <tr><td>4</td><td>Feed Social</td><td>Feed, kudos, comentários, follow/unfollow</td></tr>
+          <tr><td>5</td><td>Dashboard Saúde</td><td>Consolidação de dados de wearables</td></tr>
+          <tr><td>6</td><td>Strava Import</td><td>OAuth Strava, importação de histórico</td></tr>
+          <tr><td>7</td><td>Comunidade</td><td>Desafios, badges, leaderboard, clubes</td></tr>
+          <tr><td>8</td><td>Polish &amp; Launch</td><td>QA, beta fechado, soft launch</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">🎯</span>
+        <p><strong>Marcos:</strong> 5.000 usuários em 30 dias · Retenção D7 &gt; 40% · 3+ atividades/semana/usuário · NPS &gt; 40</p>
+      </div>
+
+      <div class="doc-h2">Fase 2 — Growth B2C + MVP B2B (Meses 7–10)</div>
+      <p><strong>Objetivo:</strong> Escalar base B2C, lançar dashboard B2B e primeiros clientes pagantes.</p>
+      <ul class="doc-list">
+        <li>Eventos com inscrição e pagamento PIX integrados</li>
+        <li>FitCoins e área de membros com ofertas de marcas</li>
+        <li>Dashboard B2B: posts patrocinados, segmentação, analytics, cupons</li>
+        <li>Multi-modalidade: ciclismo, academia, natação</li>
+        <li>Sync com Polar, COROS, Samsung Health</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">🎯</span>
+        <p><strong>Marcos:</strong> 50.000 usuários ativos · 10 empresas pagantes · R$ 50K MRR B2B · 5 eventos realizados</p>
+      </div>
+
+      <div class="doc-h2">Fase 3 — Scale &amp; Ecosystem (Meses 11–14)</div>
+      <p><strong>Objetivo:</strong> Consolidar monetização, funcionalidades avançadas, preparar para escala.</p>
+      <ul class="doc-list">
+        <li>IA para insights personalizados de treino e saúde</li>
+        <li>Body Score diário unificado</li>
+        <li>Dashboard analytics completo com infográficos automáticos</li>
+        <li>API pública para desenvolvedores terceiros</li>
+        <li>Compliance LGPD auditado</li>
+        <li>Infraestrutura auto-scaling para picos de evento</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">🎯</span>
+        <p><strong>Marcos:</strong> 200.000 usuários · 200 empresas B2B · R$ 300K MRR · Unit economics positivo (LTV &gt; 3x CAC)</p>
+      </div>
+
+      <div class="doc-h2">Fase 4 — Expansão LatAm (Meses 15–20)</div>
+      <p><strong>Objetivo:</strong> Expandir para mercados latino-americanos e buscar rodada de investimento.</p>
+      <p><strong>Mercados prioritários:</strong> México, Colômbia, Argentina, Chile.</p>
+      <ul class="doc-list">
+        <li>Localização completa (idioma, moeda, meios de pagamento locais)</li>
+        <li>Parcerias com assessorias e eventos em cada país</li>
+        <li>Time comercial B2B local ou representantes</li>
+        <li>Captação Seed / Série A</li>
+      </ul>
+      <div class="callout callout-yellow">
+        <span class="callout-icon">🎯</span>
+        <p><strong>Marcos:</strong> 500.000 usuários (Brasil + LatAm) · Presença em 3+ países · R$ 1M MRR · Rodada captada</p>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 08 GANTT ══ -->
+    <div class="doc-section" id="s-gantt">
+      <div class="section-tag">08 · Cronograma</div>
+      <div class="doc-h1">Gantt — 20 Meses</div>
+      <p>Visão completa das atividades por fase ao longo de 20 meses de execução.</p>
+      <div class="gantt-section">
+        <div class="gantt-scroll">
+          <table class="gantt-tbl" id="gantt-doc"></table>
+        </div>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 09 FINANCEIRO ══ -->
+    <div class="doc-section" id="s-financeiro">
+      <div class="section-tag">09 · Financeiro</div>
+      <div class="doc-h1">Resumo Financeiro</div>
+
+      <table>
+        <thead><tr><th>Fase</th><th>Duração</th><th>Investimento</th><th>MRR (final da fase)</th></tr></thead>
+        <tbody>
+          <tr><td>0 — Discovery</td><td>2 meses</td><td>R$ 50.000</td><td>—</td></tr>
+          <tr><td>1 — MVP</td><td>4 meses</td><td>R$ 250.000</td><td>R$ 10.000</td></tr>
+          <tr><td>2 — Growth</td><td>4 meses</td><td>R$ 500.000</td><td>R$ 150.000</td></tr>
+          <tr><td>3 — Scale</td><td>4 meses</td><td>R$ 900.000</td><td>R$ 500.000</td></tr>
+          <tr><td>4 — LatAm</td><td>6 meses</td><td>R$ 3.000.000</td><td>R$ 2.000.000</td></tr>
+          <tr style="font-weight:700;background:var(--bg-subtle)"><td><strong>Total</strong></td><td><strong>20 meses</strong></td><td><strong>R$ 4.700.000</strong></td><td><strong>R$ 2.000.000/mês</strong></td></tr>
+        </tbody>
+      </table>
+
+      <div class="doc-h2">Estratégia de Funding</div>
+      <table>
+        <thead><tr><th>Rodada</th><th>Momento</th><th>Valor</th><th>Tese</th></tr></thead>
+        <tbody>
+          <tr><td>Bootstrapping</td><td>Fases 0–1</td><td>R$ 300K</td><td>Capital próprio para validação</td></tr>
+          <tr><td>Angel / Pre-seed</td><td>Final Fase 1</td><td>R$ 500K–1M</td><td>Métricas de tração comprovadas</td></tr>
+          <tr><td>Seed</td><td>Final Fase 2</td><td>R$ 3M–5M</td><td>Revenue recorrente + unit economics</td></tr>
+          <tr><td>Série A</td><td>Fase 4</td><td>R$ 15M–30M</td><td>Escala LatAm + dados comprovados</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 10 MÉTRICAS ══ -->
+    <div class="doc-section" id="s-metricas">
+      <div class="section-tag">10 · Métricas</div>
+      <div class="doc-h1">North Star KPIs</div>
+
+      <div class="doc-h2">B2C</div>
+      <div class="card-grid cg-3">
+        <div class="info-card"><div class="ic-label">Retenção D30</div><div class="ic-value">&gt;45%</div><div class="ic-sub">% ativos após 30 dias</div></div>
+        <div class="info-card"><div class="ic-label">Atividades/semana</div><div class="ic-value">3+</div><div class="ic-sub">por usuário ativo</div></div>
+        <div class="info-card"><div class="ic-label">DAU/MAU</div><div class="ic-value">40%</div><div class="ic-sub">engajamento diário</div></div>
+        <div class="info-card"><div class="ic-label">NPS</div><div class="ic-value">&gt;50</div><div class="ic-sub">Net Promoter Score</div></div>
+        <div class="info-card"><div class="ic-label">WAU</div><div class="ic-value">Weekly Active</div><div class="ic-sub">1+ atividade/semana</div></div>
+        <div class="info-card"><div class="ic-label">Wearable Connect</div><div class="ic-value">&gt;30%</div><div class="ic-sub">usuários com 1+ device</div></div>
+      </div>
+
+      <div class="doc-h2">B2B</div>
+      <div class="card-grid cg-3">
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">ROI Médio</div><div class="ic-value" style="color:var(--accent)">4.2x</div><div class="ic-sub">retorno por campanha</div></div>
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">Renovação</div><div class="ic-value" style="color:var(--accent)">&gt;80%</div><div class="ic-sub">retenção de clientes B2B</div></div>
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">Time to Value</div><div class="ic-value" style="color:var(--accent)">&lt;7 dias</div><div class="ic-sub">do cadastro à 1ª campanha</div></div>
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">LTV/CAC</div><div class="ic-value" style="color:var(--accent)">&gt;3x</div><div class="ic-sub">unit economics saudável</div></div>
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">ARPU B2B</div><div class="ic-value">R$ 5K+</div><div class="ic-sub">receita média por empresa</div></div>
+        <div class="info-card" style="border-color:rgba(0,212,170,.2)"><div class="ic-label">Empresas Ativas</div><div class="ic-value">500</div><div class="ic-sub">meta mês 24</div></div>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 11 RISCOS ══ -->
+    <div class="doc-section" id="s-riscos">
+      <div class="section-tag">11 · Riscos</div>
+      <div class="doc-h1">Riscos e Mitigações</div>
+      <table>
+        <thead><tr><th>Risco</th><th>Prob.</th><th>Impacto</th><th>Mitigação</th><th>Contingência</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Cold Start</strong></td>
+            <td><span class="badge badge-red">Alta</span></td>
+            <td><span class="badge badge-red">Alto</span></td>
+            <td>Parceria com assessorias de corrida como embaixadores do beta</td>
+            <td>Niche down — focar só em corrida de rua até massa crítica</td>
+          </tr>
+          <tr>
+            <td><strong>Strava incumbente</strong></td>
+            <td><span class="badge badge-red">Alta</span></td>
+            <td><span class="badge badge-yellow">Médio</span></td>
+            <td>Integrar com Strava, não competir. Adicionar camadas ausentes</td>
+            <td>Posicionar como complemento, não substituto</td>
+          </tr>
+          <tr>
+            <td><strong>LGPD / dados saúde</strong></td>
+            <td><span class="badge badge-yellow">Média</span></td>
+            <td><span class="badge badge-red">Alto</span></td>
+            <td>DPO desde o dia 1. Consentimento granular. B2B com dados anônimos</td>
+            <td>Privacy by design na arquitetura desde o MVP</td>
+          </tr>
+          <tr>
+            <td><strong>Retenção de usuários</strong></td>
+            <td><span class="badge badge-red">Alta</span></td>
+            <td><span class="badge badge-red">Alto</span></td>
+            <td>Gamificação + FitCoins + benefícios tangíveis reais</td>
+            <td>Notificações de streaks, desafios sociais e ranking entre amigos</td>
+          </tr>
+          <tr>
+            <td><strong>Monetização B2B lenta</strong></td>
+            <td><span class="badge badge-yellow">Média</span></td>
+            <td><span class="badge badge-red">Alto</span></td>
+            <td>Tier gratuito B2B para atrair primeiras marcas com ROI comprovado</td>
+            <td>Eventos como prova de conceito rápida com dados reais</td>
+          </tr>
+          <tr>
+            <td><strong>Dependência de APIs</strong></td>
+            <td><span class="badge badge-yellow">Média</span></td>
+            <td><span class="badge badge-yellow">Médio</span></td>
+            <td>Suportar múltiplas fontes. GPS próprio como fallback</td>
+            <td>Exportar/importar FIT/GPX como camada de resiliência</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ══ 12 PRIMEIROS 30 DIAS ══ -->
+    <div class="doc-section" id="s-30dias">
+      <div class="section-tag">12 · Quick Wins</div>
+      <div class="doc-h1">Primeiros 30 Dias</div>
+      <div class="doc-lead">Ações imediatas para começar antes mesmo do time completo estar formado.</div>
+      <table>
+        <thead><tr><th>Período</th><th>Ação</th><th>Responsável</th><th>Entrega</th></tr></thead>
+        <tbody>
+          <tr><td>Dias 1–3</td><td>Registrar marca "FitPulse"</td><td>Fundador</td><td>Protocolo INPI</td></tr>
+          <tr><td>Dias 1–5</td><td>Identidade visual mínima</td><td>Designer freelancer</td><td>Logo, cores, tipografia</td></tr>
+          <tr><td>Dias 1–7</td><td>Landing page + waitlist</td><td>Fundador</td><td>Página online com formulário</td></tr>
+          <tr><td>Dias 3–10</td><td>10 entrevistas com corredores</td><td>Fundador</td><td>Insights documentados</td></tr>
+          <tr><td>Dias 5–15</td><td>Mapear 50 marcas-alvo B2B</td><td>Fundador</td><td>Pipeline inicial de vendas</td></tr>
+          <tr><td>Dias 10–20</td><td>Protótipos de alta fidelidade</td><td>Designer</td><td>Figma com fluxos do MVP</td></tr>
+          <tr><td>Dias 15–25</td><td>Setup técnico</td><td>Tech Lead</td><td>Repo, CI/CD, infra base AWS</td></tr>
+          <tr><td>Dias 20–30</td><td>Fechar 2–3 assessorias parceiras</td><td>Fundador</td><td>Contratos de parceria beta</td></tr>
+          <tr><td>Dias 25–30</td><td>Sprint 1 iniciado</td><td>Time dev</td><td>Auth + Infra funcionando</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-green">
+        <span class="callout-icon">🚀</span>
+        <p><strong>Visão de longo prazo:</strong> FitPulse se torna o <strong>sistema operacional da vida fitness</strong> — o lugar onde atletas vivem seu dia a dia esportivo e marcas acessam o público mais engajado e nichado do mercado. Ano 1 no Brasil, Ano 2 na LatAm, Ano 3 candidato a liderança regional.</p>
+      </div>
+    </div>
+
+  </div><!-- /doc-body -->
+</div><!-- /doc-wrap -->
+
+<script>
+// ── Build Document Gantt ──
+const ganttRows = [
+  { section: 'FASE 0 — Discovery & Design' },
+  { label: 'Pesquisa com usuários',       color:'#FF4D00', start:0, span:1 },
+  { label: 'Análise competitiva',         color:'#FF4D00', start:0, span:1 },
+  { label: 'Personas e jornadas',         color:'#FF6B2B', start:1, span:1 },
+  { label: 'Design System + Protótipos', color:'#FF6B2B', start:1, span:2 },
+  { label: 'Testes usabilidade + time',  color:'#FF8C57', start:1, span:2 },
+  { section: 'FASE 1 — MVP B2C (M3–6)' },
+  { label: 'S1: Setup & Auth',           color:'#FF4D00', start:2, span:1 },
+  { label: 'S2: Perfil + GPS',           color:'#FF4D00', start:2, span:1 },
+  { label: 'S3: Integrações wearables',  color:'#FF4D00', start:3, span:1 },
+  { label: 'S4: Feed Social',            color:'#FF4D00', start:3, span:1 },
+  { label: 'S5: Dashboard Saúde',        color:'#FF6B2B', start:4, span:1 },
+  { label: 'S6: Strava Import',          color:'#FF6B2B', start:4, span:1 },
+  { label: 'S7: Comunidade',             color:'#FF6B2B', start:4, span:1 },
+  { label: '🚀 Soft Launch',             color:'#cc3a00', start:5, span:1 },
+  { section: 'FASE 2 — Growth + B2B (M7–10)' },
+  { label: 'Eventos + PIX',             color:'#FFB800', start:6, span:2 },
+  { label: 'FitCoins + Marketplace',    color:'#FFB800', start:6, span:2 },
+  { label: 'Dashboard B2B MVP',         color:'#E09B00', start:6, span:3 },
+  { label: 'Posts patrocinados',        color:'#E09B00', start:7, span:2 },
+  { label: 'Multi-modalidade',          color:'#FFB800', start:8, span:2 },
+  { section: 'FASE 3 — Scale (M11–14)' },
+  { label: 'IA + Body Score',           color:'#00D4AA', start:10, span:2 },
+  { label: 'Analytics avançado B2B',    color:'#00D4AA', start:10, span:3 },
+  { label: 'API pública',               color:'#00B894', start:11, span:2 },
+  { label: 'Compliance LGPD',           color:'#00B894', start:11, span:2 },
+  { label: 'Apple Watch + BLE',         color:'#00D4AA', start:12, span:2 },
+  { section: 'FASE 4 — LatAm (M15–20)' },
+  { label: 'Localização MX + CO',       color:'#8A2BE2', start:14, span:3 },
+  { label: 'Localização AR + CL',       color:'#8A2BE2', start:15, span:3 },
+  { label: 'Time comercial local',      color:'#7B2FBE', start:14, span:4 },
+  { label: '💰 Captação Série A',       color:'#6A20A8', start:17, span:2 },
+];
+
+const tbl = document.getElementById('gantt-doc');
+
+// header
+let hdr = '<thead><tr><th style="text-align:left;min-width:170px;background:#F8F8FA;">Atividade</th>';
+for (let m = 1; m <= 20; m++) hdr += `<th style="min-width:30px;background:#F8F8FA;">M${m}</th>`;
+hdr += '</tr></thead><tbody>';
+tbl.innerHTML = hdr;
+const tbody = document.createElement('tbody');
+tbl.appendChild(tbody);
+
+ganttRows.forEach(row => {
+  const tr = document.createElement('tr');
+  if (row.section) {
+    tr.className = 'g-section';
+    tr.innerHTML = `<td colspan="21">${row.section}</td>`;
+    tbody.appendChild(tr); return;
+  }
+  let cells = `<td style="font-size:11px;color:#555570;white-space:nowrap;padding:2px 4px;">${row.label}</td>`;
+  for (let m = 0; m < 20; m++) {
+    if (m === row.start) {
+      cells += `<td class="g-cell" colspan="${row.span}" style="border-left:1px solid rgba(228,228,238,.6);">
+        <div class="g-bar" style="background:${row.color};"></div>
+      </td>`;
+      m += row.span - 1;
+    } else {
+      cells += `<td class="g-cell" style="border-left:1px solid rgba(228,228,238,.6);"></td>`;
+    }
+  }
+  tr.innerHTML = cells;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>

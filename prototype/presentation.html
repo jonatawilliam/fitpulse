@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitPulse — Visão de Produto & Plano de Atuação</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --primary: #FF4D00;
+  --primary-light: #FF6B2B;
+  --accent: #00D4AA;
+  --warning: #FFB800;
+  --danger: #FF4757;
+  --bg: #0A0A0F;
+  --bg-card: #14141F;
+  --bg-input: #1E1E2E;
+  --text: #FFFFFF;
+  --text-secondary: #8B8BA3;
+  --text-muted: #a6a6b2;
+  --border: #2A2A3C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #000;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ── Slide Container ── */
+.deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* ── Navigation Bar ── */
+.nav-bar {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(20,20,31,0.95);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 10px 20px;
+  z-index: 9999;
+  backdrop-filter: blur(20px);
+}
+.nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary);
+  font-size: 16px; transition: all .15s;
+  user-select: none;
+}
+.nav-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+.nav-counter { font-size: 13px; color: var(--text-secondary); min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+.nav-dots { display: flex; gap: 6px; align-items: center; }
+.nav-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-muted); transition: all .2s; cursor: pointer;
+}
+.nav-dot.active { background: var(--primary); width: 20px; border-radius: 3px; }
+
+/* ── Keyboard hint ── */
+.key-hint {
+  position: fixed; top: 20px; right: 24px;
+  font-size: 11px; color: var(--text-muted);
+  display: flex; gap: 6px; align-items: center;
+  z-index: 1000;
+}
+.key-hint kbd {
+  padding: 2px 6px; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 4px; font-size: 10px;
+}
+
+/* ── Slide number badge ── */
+.slide-badge {
+  position: absolute; top: 28px; left: 44px;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 2px;
+  z-index: 10;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 1 — Cover
+══════════════════════════════════════ */
+#s1 {
+  align-items: center; justify-content: center; text-align: center;
+  position: relative;
+}
+#s1::before {
+  content: '';
+  position: absolute;
+  top: -200px; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 900px;
+  background: radial-gradient(circle, rgba(255,77,0,0.14) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cover-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px;
+  background: rgba(255,77,0,0.1); border: 1px solid rgba(255,77,0,0.25);
+  border-radius: 30px; font-size: 12px; font-weight: 700;
+  color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 32px;
+}
+.cover-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.cover-logo {
+  font-size: 88px; font-weight: 900; letter-spacing: -4px; line-height: 1;
+  background: linear-gradient(135deg, #FF4D00 0%, #FF6B2B 40%, #FFB800 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+}
+.cover-subtitle {
+  font-size: 22px; font-weight: 400; color: var(--text-secondary);
+  max-width: 600px; line-height: 1.5; margin-bottom: 50px;
+}
+.cover-pills { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.pill {
+  padding: 10px 22px; border-radius: 30px;
+  border: 1px solid var(--border); font-size: 14px;
+  color: var(--text-secondary); background: var(--bg-card);
+}
+.cover-meta {
+  position: absolute; bottom: 100px;
+  font-size: 12px; color: var(--text-muted);
+  display: flex; gap: 32px;
+}
+.cover-meta span strong { color: var(--text-secondary); }
+
+/* ══════════════════════════════════════
+   SHARED STYLES
+══════════════════════════════════════ */
+.slide-content {
+  flex: 1; padding: 64px 80px 100px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.slide-title {
+  font-size: 42px; font-weight: 800; letter-spacing: -1.5px;
+  margin-bottom: 8px; line-height: 1.1;
+  color: var(--text-muted);
+}
+.slide-title .hl { color: var(--primary); }
+.slide-title .hl-green { color: var(--accent); }
+.slide-desc {
+  font-size: 15px; color: var(--text-secondary);
+  margin-bottom: 36px; max-width: 700px; line-height: 1.5;
+}
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;
+}
+.tag { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.tag-red { background: rgba(255,77,0,.12); color: var(--primary); }
+.tag-green { background: rgba(0,212,170,.12); color: var(--accent); }
+.tag-yellow { background: rgba(255,184,0,.12); color: var(--warning); }
+
+/* Grid helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px;
+}
+.card-icon { font-size: 26px; margin-bottom: 10px; }
+.card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ══════════════════════════════════════
+   SLIDE 2 — Problema
+══════════════════════════════════════ */
+.problem-cols {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+  flex: 1;
+}
+.problem-side {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px;
+}
+.problem-side h3 {
+  font-size: 16px; font-weight: 700; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.problem-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 14px; font-size: 14px; color: var(--text-secondary);
+  line-height: 1.5;
+}
+.problem-item .bullet {
+  width: 6px; height: 6px; border-radius: 50%; margin-top: 7px;
+  flex-shrink: 0;
+}
+.bullet-red { background: var(--primary); }
+.bullet-green { background: var(--accent); }
+
+/* ══════════════════════════════════════
+   SLIDE 3 — Solução / Posicionamento
+══════════════════════════════════════ */
+.solution-center {
+  display: flex; align-items: center; justify-content: center;
+  flex: 1; position: relative;
+}
+.solution-hub {
+  width: 160px; height: 160px; border-radius: 50%;
+  background: linear-gradient(135deg, #FF4D00, #FF6B2B);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; text-align: center;
+  box-shadow: 0 0 60px rgba(255,77,0,0.35);
+  z-index: 2; position: relative;
+}
+.solution-hub .logo { font-size: 22px; font-weight: 900; color: #fff; }
+.solution-hub .tagline { font-size: 10px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.orbit-items {
+  position: absolute; width: 500px; height: 500px;
+}
+.orbit-item {
+  position: absolute; transform: translate(-50%,-50%);
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 18px;
+  text-align: center; min-width: 120px;
+  font-size: 13px; font-weight: 600;
+}
+.orbit-item .oi-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+.oi-b2c { color: var(--primary); border-color: rgba(255,77,0,.3); }
+.oi-b2b { color: var(--accent); border-color: rgba(0,212,170,.3); }
+
+/* ══════════════════════════════════════
+   SLIDE 4 — Concorrentes
+══════════════════════════════════════ */
+.competitor-table { width: 100%; border-collapse: collapse; }
+.competitor-table th {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.competitor-table td {
+  padding: 14px 16px; font-size: 13px;
+  border-bottom: 1px solid rgba(42,42,60,.5);
+  vertical-align: middle;
+  font-size: 11px; color: var(--text);
+}
+.competitor-table tr:hover td { background: var(--bg-card); }
+.competitor-table tr.fitpulse-row td { background: rgba(255,77,0,.05); }
+.competitor-table tr.fitpulse-row td:first-child { font-weight: 700; color: var(--primary); }
+.check-yes { color: var(--accent); font-weight: 700; }
+.check-no  { color: var(--text-muted); }
+.check-part{ color: var(--warning); font-weight: 600; }
+
+/* ══════════════════════════════════════
+   SLIDE 5 — Público-alvo
+══════════════════════════════════════ */
+.persona-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+.persona-card .pa-icon { font-size: 28px; margin-bottom: 10px; }
+.persona-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.persona-card .pa-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+.persona-card .pa-need {
+  font-size: 12px; color: var(--text-muted);
+  padding: 8px 10px; background: var(--bg-input);
+  border-radius: 8px; line-height: 1.4;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 6 — Features
+══════════════════════════════════════ */
+.features-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1;
+}
+.features-col h3 {
+  font-size: 14px; font-weight: 700; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.feature-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 10px;
+}
+.feature-row .fr-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.feature-row .fr-text { font-size: 13px; }
+.feature-row .fr-text strong { display: block; font-weight: 600; margin-bottom: 1px; }
+.feature-row .fr-text span { color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+
+/* ══════════════════════════════════════
+   SLIDE 7 — Monetização
+══════════════════════════════════════ */
+.mono-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;
+}
+.mono-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px;
+}
+.mono-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px; }
+.mono-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid rgba(42,42,60,.5);
+  font-size: 13px;
+}
+.mono-row:last-child { border: none; }
+.mono-row .label { color: var(--text-secondary); }
+.mono-row .value { font-weight: 600; }
+.projection-bar-chart { margin-top: 16px; }
+.pbc-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.pbc-label { font-size: 11px; color: var(--text-secondary); width: 60px; flex-shrink: 0; }
+.pbc-track { flex: 1; height: 8px; background: var(--bg-input); border-radius: 4px; overflow: hidden; }
+.pbc-fill { height: 100%; border-radius: 4px; }
+.pbc-val { font-size: 12px; font-weight: 700; width: 80px; text-align: right; }
+
+/* ══════════════════════════════════════
+   SLIDE 8 — Stack Técnico
+══════════════════════════════════════ */
+.stack-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; flex: 1;
+}
+.stack-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 18px;
+}
+.stack-card .sc-layer {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--primary); margin-bottom: 6px;
+}
+.stack-card .sc-tech { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.stack-card .sc-why { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+/* ══════════════════════════════════════
+   SLIDE 9 — Plano de Fases (overview)
+══════════════════════════════════════ */
+.phases-row {
+  display: flex; gap: 12px; flex: 1; align-items: stretch;
+}
+.phase-card {
+  flex: 1; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
+  transition: border-color .2s;
+}
+.phase-card:hover { border-color: var(--primary); }
+.phase-number {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; margin-bottom: 12px;
+}
+.phase-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.phase-card .ph-duration { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+.phase-card .ph-invest { font-size: 13px; font-weight: 700; color: var(--warning); }
+.phase-card .ph-mrr { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.phase-deliverables { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+.ph-item { font-size: 11px; color: var(--text-secondary); display: flex; gap: 6px; }
+.ph-item::before { content: '→'; color: var(--primary); flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   SLIDE 10 — Gantt
+══════════════════════════════════════ */
+.gantt-wrapper {
+  flex: 1; overflow-x: hidden; overflow-y: auto;
+  padding-right: 4px;
+}
+.gantt-wrapper::-webkit-scrollbar { width: 4px; }
+.gantt-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.gantt-table { width: 100%; border-collapse: collapse; }
+.gantt-table th {
+  font-size: 10px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  font-weight: 600; padding: 0 4px 10px; text-align: center;
+}
+.gantt-table th:first-child { text-align: left; width: 180px; padding-left: 0; }
+.gantt-row-header td {
+  padding: 8px 0 4px;
+  font-size: 11px; font-weight: 700; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  background: var(--bg);
+}
+.gantt-row td { padding: 3px 4px; }
+.gantt-label {
+  font-size: 12px; color: var(--text-secondary); padding: 0; white-space: nowrap;
+}
+.gantt-cell { height: 22px; position: relative; }
+.gantt-bar {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 4px; opacity: .85;
+  transition: opacity .15s;
+  display: flex; align-items: center; padding: 0 8px;
+  font-size: 10px; font-weight: 600; color: rgba(255,255,255,.9);
+  white-space: nowrap; overflow: hidden;
+}
+.gantt-bar:hover { opacity: 1; }
+.gantt-phase-label {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 6px; left: 0; right: 0;
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9);
+}
+.gantt-milestone {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px;
+  background: var(--warning);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255,184,0,.5);
+}
+/* Month grid lines */
+.gantt-gridline { border-left: 1px solid rgba(42,42,60,.4); }
+.gantt-quarter { border-left: 1px solid rgba(42,42,60,.8); }
+
+/* ══════════════════════════════════════
+   SLIDE 11 — Métricas & KPIs
+══════════════════════════════════════ */
+.kpi-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; text-align: center;
+}
+.kpi-card .kpi-val { font-size: 28px; font-weight: 800; color: var(--text);};
+.kpi-card .kpi-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+.kpi-card .kpi-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* ══════════════════════════════════════
+   SLIDE 12 — Riscos
+══════════════════════════════════════ */
+.risk-grid { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.risk-row {
+  display: grid; grid-template-columns: 180px 80px 80px 1fr 1fr;
+  gap: 16px; align-items: center;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+}
+.risk-row .rr-name { font-size: 13px; font-weight: 600; color: var(--text);}
+.risk-badge {
+  text-align: center; padding: 4px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 700;
+}
+.rb-high { background: rgba(255,71,87,.15); color: var(--danger); }
+.rb-med  { background: rgba(255,184,0,.15);  color: var(--warning); }
+.rr-mit { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+/* ══════════════════════════════════════
+   SLIDE 13 — Próximos 30 Dias
+══════════════════════════════════════ */
+.days-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; flex: 1;
+}
+.day-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+}
+.day-card .dc-days {
+  font-size: 11px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+}
+.day-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.day-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ══════════════════════════════════════
+   SLIDE 14 — Vision Final (Closing)
+══════════════════════════════════════ */
+#s14 {
+  align-items: center; justify-content: center; text-align: center;
+  position: relative;
+}
+#s14::before {
+  content: ''; position: absolute; bottom: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(0,212,170,.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+.closing-eyebrow {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--accent); margin-bottom: 20px;
+}
+.closing-h1 {
+  font-size: 52px; font-weight: 900; letter-spacing: -2px;
+  line-height: 1.1; margin-bottom: 20px;
+  max-width: 700px;
+  color: var(--text-muted);
+}
+.closing-h1 span { color: var(--primary); }
+.closing-sub {
+  font-size: 18px; color: var(--text-secondary);
+  max-width: 550px; margin: 0 auto 44px; line-height: 1.6;
+}
+.closing-stats {
+  display: flex; gap: 56px; justify-content: center; margin-bottom: 44px;
+}
+.cs-item { text-align: center; }
+.cs-value { font-size: 36px; font-weight: 900; color: var(--text);}
+.cs-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Progress bar at top ── */
+.progress-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--border); z-index: 9999;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #FF4D00, #FF6B2B);
+  transition: width .3s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- Keyboard hint -->
+<div class="key-hint">
+  <kbd>←</kbd><kbd>→</kbd> navegar &nbsp;|&nbsp; <kbd>F</kbd> fullscreen
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <div class="nav-btn" id="prev-btn" onclick="prevSlide()">&#8592;</div>
+  <div class="nav-dots" id="nav-dots"></div>
+  <div class="nav-counter" id="counter">1 / 14</div>
+  <div class="nav-btn" id="next-btn" onclick="nextSlide()">&#8594;</div>
+</div>
+
+<div class="deck">
+
+<!-- ═══════════════ SLIDE 1 — COVER ═══════════════ -->
+<div class="slide active" id="s1">
+  <div class="cover-tag"><span class="dot"></span> Visão de Produto & Plano de Atuação</div>
+  <div class="cover-logo">FitPulse</div>
+  <div class="cover-subtitle">O sistema operacional da vida fitness — conectando atletas e marcas através de dados, comunidade e experiências.</div>
+  <div class="cover-pills">
+    <div class="pill">🏃 B2C Fitness Platform</div>
+    <div class="pill">📊 B2B Analytics</div>
+    <div class="pill">📅 20 Meses de Roadmap</div>
+    <div class="pill">🇧🇷 Brasil → LatAm</div>
+  </div>
+  <div class="cover-meta">
+    <span><strong>Versão</strong> 1.0</span>
+    <span><strong>Data</strong> Março 2026</span>
+    <span><strong>Status</strong> Pré-seed</span>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 2 — PROBLEMA ═══════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-badge">01 · Problema</div>
+  <div class="slide-content">
+    <div class="slide-title">O problema é <span class="hl">fragmentação</span></div>
+    <div class="slide-desc">Dados, comunidade, eventos e benefícios fitness existem em silos separados — para usuários e empresas.</div>
+    <div class="problem-cols">
+      <div class="problem-side">
+        <h3><span style="font-size:20px">🏃</span> Para o Atleta (B2C)</h3>
+        <div class="problem-item"><span class="bullet bullet-red"></span>Dados de treino fragmentados: Garmin aqui, Strava ali, academia em outro lugar</div>
+        <div class="problem-item"><span class="bullet bullet-red"></span>Nenhuma plataforma une treino + saúde + comunidade + eventos + descontos</div>
+        <div class="problem-item"><span class="bullet bullet-red"></span>Strava é limitado ao registro; redes sociais genéricas não entendem o contexto esportivo</div>
+        <div class="problem-item"><span class="bullet bullet-red"></span>Difícil descobrir eventos relevantes para o seu perfil de atleta</div>
+      </div>
+      <div class="problem-side">
+        <h3><span style="font-size:20px">🏢</span> Para a Empresa (B2B)</h3>
+        <div class="problem-item"><span class="bullet bullet-green"></span>Marcas esportivas pagam mídia genérica sem atingir público nichado e engajado</div>
+        <div class="problem-item"><span class="bullet bullet-green"></span>Falta de dados comportamentais reais de atletas (só dados declarados)</div>
+        <div class="problem-item"><span class="bullet bullet-green"></span>Impossível medir ROI de patrocínios, eventos e campanhas no fitness</div>
+        <div class="problem-item"><span class="bullet bullet-green"></span>Organizadores de eventos sem ferramentas integradas de engajamento</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 3 — SOLUÇÃO ═══════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-badge">02 · Solução</div>
+  <div class="slide-content">
+    <div class="slide-title">FitPulse preenche o <span class="hl">gap</span></div>
+    <div class="slide-desc">Uma plataforma dual-sided que conecta atletas engajados às marcas que eles amam.</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; flex:1;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:28px;">
+        <div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">B2C — Para o Atleta</div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(255,77,0,.1)">📍</div><div class="fr-text"><strong>Tracking Unificado</strong><span>GPS, wearables e apps em um lugar</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">❤️</div><div class="fr-text"><strong>Dashboard de Saúde</strong><span>Sono, HRV, Body Score, VO2max</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(138,43,226,.1)">📱</div><div class="fr-text"><strong>Feed Social</strong><span>Comunidade, desafios e eventos</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(255,184,0,.1)">🪙</div><div class="fr-text"><strong>FitCoins & Benefícios</strong><span>Descontos reais de marcas parceiras</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(255,71,87,.1)">🎫</div><div class="fr-text"><strong>Eventos Integrados</strong><span>Inscrição, tracking e resultados</span></div></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid rgba(0,212,170,.2);border-radius:20px;padding:28px;">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">B2B — Para a Marca</div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">🎯</div><div class="fr-text"><strong>Segmentação Avançada</strong><span>Por modalidade, frequência, localização</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">📊</div><div class="fr-text"><strong>Analytics em Tempo Real</strong><span>Impressões, engajamento, conversão</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">🏅</div><div class="fr-text"><strong>Desafios Patrocinados</strong><span>Associação direta com performance</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">💹</div><div class="fr-text"><strong>ROI Calculado</strong><span>Investimento vs. conversão real</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1)">🎪</div><div class="fr-text"><strong>Gestão de Eventos</strong><span>Plataforma completa de inscrição</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 4 — CONCORRENTES ═══════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-badge">03 · Posicionamento</div>
+  <div class="slide-content">
+    <div class="slide-title">Onde o mercado <span class="hl">falha</span></div>
+    <div class="slide-desc">Nenhum concorrente cobre o espectro completo. FitPulse ocupa o espaço vazio.</div>
+    <table class="competitor-table" style="flex:1;">
+      <thead>
+        <tr>
+          <th>Plataforma</th>
+          <th>Tracking</th>
+          <th>Social</th>
+          <th>Dashboard B2B</th>
+          <th>Eventos</th>
+          <th>Benefícios</th>
+          <th>Dados Saúde</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="fitpulse-row">
+          <td><strong>FitPulse ✦</strong></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Strava</td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-part">~</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-part">~</span></td>
+        </tr>
+        <tr>
+          <td>Garmin Connect</td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-part">~</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-yes">✓</span></td>
+        </tr>
+        <tr>
+          <td>Wellhub (Gympass)</td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-no">✗</span></td>
+        </tr>
+        <tr>
+          <td>Adidas Running</td>
+          <td><span class="check-yes">✓</span></td>
+          <td><span class="check-part">~</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-part">~</span></td>
+          <td><span class="check-part">~</span></td>
+        </tr>
+        <tr>
+          <td>Runna</td>
+          <td><span class="check-part">~</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-no">✗</span></td>
+          <td><span class="check-part">~</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">
+      <span class="check-yes">✓</span> Completo &nbsp;&nbsp;
+      <span class="check-part">~</span> Parcial &nbsp;&nbsp;
+      <span class="check-no">✗</span> Ausente
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 5 — PÚBLICO ═══════════════ -->
+<div class="slide" id="s5">
+  <div class="slide-badge">04 · Público-Alvo</div>
+  <div class="slide-content">
+    <div class="slide-title">Quem são nossos <span class="hl">usuários</span></div>
+    <div class="slide-desc">4 personas B2C e 4 personas B2B — todos com necessidades claras e não atendidas.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">B2C — Atletas</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="persona-card">
+            <div class="pa-icon">🏃‍♂️</div>
+            <h4>Corredor Recreativo</h4>
+            <div class="pa-sub">25-45 anos · 3-4x/semana · Relógio GPS</div>
+            <div class="pa-need">Registrar treinos, compartilhar conquistas, encontrar eventos de corrida</div>
+          </div>
+          <div class="persona-card">
+            <div class="pa-icon">🏋️‍♀️</div>
+            <h4>Atleta de Academia</h4>
+            <div class="pa-sub">20-40 anos · Musculação/Funcional · Smartwatch</div>
+            <div class="pa-need">Acompanhar evolução, comunidade motivacional, descontos em suplementos</div>
+          </div>
+          <div class="persona-card">
+            <div class="pa-icon">⚡</div>
+            <h4>Atleta de Performance</h4>
+            <div class="pa-sub">20-45 anos · Compite em provas · Dados avançados</div>
+            <div class="pa-need">Métricas profundas, planos de treino, preparação para competições</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">B2B — Empresas</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="persona-card" style="border-color:rgba(0,212,170,.2);">
+            <div class="pa-icon">👟</div>
+            <h4>Marca Esportiva</h4>
+            <div class="pa-sub">Nike, Adidas, New Balance, marcas regionais</div>
+            <div class="pa-need">Alcançar público nichado com dados de engajamento e conversão mensuráveis</div>
+          </div>
+          <div class="persona-card" style="border-color:rgba(0,212,170,.2);">
+            <div class="pa-icon">🎫</div>
+            <h4>Organizador de Eventos</h4>
+            <div class="pa-sub">Produtoras de corridas, maratonas, trilhas</div>
+            <div class="pa-need">Inscrição integrada + engajamento + dados pós-evento</div>
+          </div>
+          <div class="persona-card" style="border-color:rgba(0,212,170,.2);">
+            <div class="pa-icon">💊</div>
+            <h4>Suplementos / Planos de Saúde</h4>
+            <div class="pa-sub">Growth, Integral Médica, Operadoras</div>
+            <div class="pa-need">Atingir atletas com perfil de consumo comprovado, reduzir sinistralidade</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 6 — MONETIZAÇÃO ═══════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-badge">05 · Monetização</div>
+  <div class="slide-content">
+    <div class="slide-title">Modelo de <span class="hl">receita</span> dual-sided</div>
+    <div class="slide-desc">B2C por assinatura + B2B por campanhas, eventos e dados — múltiplas alavancas de receita.</div>
+    <div class="mono-grid">
+      <div class="mono-card">
+        <h3>🏃 B2C — Usuários</h3>
+        <div class="mono-row"><span class="label">Free</span><span class="value">R$ 0</span></div>
+        <div class="mono-row"><span class="label">Pro (mensal)</span><span class="value" style="color:var(--primary)">R$ 19,90</span></div>
+        <div class="mono-row"><span class="label">Pro (anual)</span><span class="value" style="color:var(--primary)">R$ 149,90</span></div>
+        <div class="mono-row"><span class="label">Eventos (comissão)</span><span class="value">8–12%</span></div>
+        <div class="mono-row"><span class="label">Marketplace (comissão)</span><span class="value">10–20%</span></div>
+      </div>
+      <div class="mono-card" style="border-color:rgba(0,212,170,.2);">
+        <h3>🏢 B2B — Empresas</h3>
+        <div class="mono-row"><span class="label">Starter (self-service)</span><span class="value">R$ 500–2K/mês</span></div>
+        <div class="mono-row"><span class="label">Pro (campanhas)</span><span class="value" style="color:var(--accent)">R$ 5K–20K/mês</span></div>
+        <div class="mono-row"><span class="label">Enterprise + dados</span><span class="value" style="color:var(--accent)">R$ 20K–100K/mês</span></div>
+        <div class="mono-row"><span class="label">Eventos (plataforma)</span><span class="value">R$ 2K + 8–12%</span></div>
+        <div class="mono-row"><span class="label">Data Insights</span><span class="value">R$ 10K–50K</span></div>
+      </div>
+      <div class="mono-card" style="grid-column:1/-1;">
+        <h3>📈 Projeção de MRR (cenário conservador)</h3>
+        <div class="projection-bar-chart">
+          <div class="pbc-row">
+            <span class="pbc-label">Mês 6</span>
+            <div class="pbc-track"><div class="pbc-fill" style="width:1.5%; background: linear-gradient(90deg,#FF4D00,#FF6B2B);"></div></div>
+            <span class="pbc-val">R$ 30K</span>
+          </div>
+          <div class="pbc-row">
+            <span class="pbc-label">Mês 12</span>
+            <div class="pbc-track"><div class="pbc-fill" style="width:7.5%; background: linear-gradient(90deg,#FF4D00,#FF6B2B);"></div></div>
+            <span class="pbc-val">R$ 150K</span>
+          </div>
+          <div class="pbc-row">
+            <span class="pbc-label">Mês 18</span>
+            <div class="pbc-track"><div class="pbc-fill" style="width:25%; background: linear-gradient(90deg,#FF6B2B,#FFB800);"></div></div>
+            <span class="pbc-val">R$ 500K</span>
+          </div>
+          <div class="pbc-row">
+            <span class="pbc-label">Mês 24</span>
+            <div class="pbc-track"><div class="pbc-fill" style="width:100%; background: linear-gradient(90deg,#FFB800,#00D4AA);"></div></div>
+            <span class="pbc-val">R$ 2M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 7 — STACK ═══════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-badge">06 · Tecnologia</div>
+  <div class="slide-content">
+    <div class="slide-title">Stack <span class="hl">tecnológico</span></div>
+    <div class="slide-desc">Escolhas orientadas a velocidade de desenvolvimento, escala e custo operacional.</div>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="sc-layer">Mobile</div>
+        <div class="sc-tech">React Native (Expo)</div>
+        <div class="sc-why">Cross-platform, time único iOS + Android, ecossistema maduro</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Web / B2B Dashboard</div>
+        <div class="sc-tech">Next.js + React</div>
+        <div class="sc-why">SSR, performance, reutiliza componentes do mobile</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Backend / API</div>
+        <div class="sc-tech">NestJS + Go</div>
+        <div class="sc-why">NestJS para features, Go para ingestão de dados de alta performance</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Banco de Dados</div>
+        <div class="sc-tech">PostgreSQL + TimescaleDB</div>
+        <div class="sc-why">Relacional + time-series otimizado para dados de atividade</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Cache / Realtime</div>
+        <div class="sc-tech">Redis</div>
+        <div class="sc-why">Sessões, feeds em tempo real, leaderboards</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Filas / Eventos</div>
+        <div class="sc-tech">Kafka / RabbitMQ</div>
+        <div class="sc-why">Sync assíncrono de wearables e pipelines de analytics</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Analytics / BI</div>
+        <div class="sc-tech">ClickHouse</div>
+        <div class="sc-why">Processamento analítico de grande volume para dashboard B2B</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Infraestrutura</div>
+        <div class="sc-tech">AWS + Vercel</div>
+        <div class="sc-why">Auto-scaling, CDN global, serverless onde possível</div>
+      </div>
+      <div class="stack-card">
+        <div class="sc-layer">Integrações Mobile</div>
+        <div class="sc-tech">HealthKit + Health Connect</div>
+        <div class="sc-why">Cobertura nativa iOS/Android para dados de saúde e wearables</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 8 — INTEGRAÇÕES ═══════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-badge">07 · Integrações</div>
+  <div class="slide-content">
+    <div class="slide-title">Ecossistema de <span class="hl">integrações</span></div>
+    <div class="slide-desc">Priorização em 3 fases — do MVP ao ecossistema completo.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;flex:1;">
+      <div style="background:var(--bg-card);border:1px solid rgba(255,77,0,.2);border-radius:16px;padding:22px;">
+        <div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Fase 1 — MVP</div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(255,77,0,.1);font-size:16px;">❤️</div><div class="fr-text"><strong>HealthKit (iOS)</strong><span>Sync nativo Apple</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(61,220,132,.1);font-size:16px;">💚</div><div class="fr-text"><strong>Health Connect (Android)</strong><span>Sync nativo Google</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(255,102,0,.1);font-size:16px;">🏃</div><div class="fr-text"><strong>Strava API</strong><span>Importar histórico</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(0,112,255,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>Garmin Connect</strong><span>Sync automático</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(0,212,170,.1);font-size:16px;">📍</div><div class="fr-text"><strong>GPS Nativo</strong><span>Tracking no celular</span></div></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Fase 2 — Expansão</div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(0,0,0,.3);font-size:16px;">⌚</div><div class="fr-text"><strong>Apple Watch App</strong><span>Companion nativo</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(220,0,0,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>Polar AccessLink</strong><span>Dados + recuperação</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(0,180,100,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>COROS API</strong><span>EvoLab + atividades</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(0,100,200,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>Samsung Health</strong><span>Galaxy Watch</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(100,100,100,.1);font-size:16px;">📁</div><div class="fr-text"><strong>.FIT / .GPX / .TCX</strong><span>Upload manual</span></div></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Fase 3 — Ecossistema</div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(255,255,255,.05);font-size:16px;">🔵</div><div class="fr-text"><strong>Bluetooth LE</strong><span>Sensores FC, potência, cadência</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(220,220,220,.05);font-size:16px;">⌚</div><div class="fr-text"><strong>Whoop API</strong><span>Recovery + HRV</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(255,150,50,.1);font-size:16px;">💍</div><div class="fr-text"><strong>Oura Ring</strong><span>Sono + recovery</span></div></div>
+        <div class="feature-row" style="margin-bottom:12px;"><div class="fr-icon" style="background:rgba(0,200,255,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>Amazfit / Zepp</strong><span>Volume no Brasil</span></div></div>
+        <div class="feature-row"><div class="fr-icon" style="background:rgba(255,80,0,.1);font-size:16px;">⌚</div><div class="fr-text"><strong>Suunto</strong><span>Aventura / trail</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 9 — VISÃO GERAL FASES ═══════════════ -->
+<div class="slide" id="s9">
+  <div class="slide-badge">08 · Plano de Atuação</div>
+  <div class="slide-content">
+    <div class="slide-title">Roadmap de <span class="hl">20 meses</span></div>
+    <div class="slide-desc">5 fases progressivas — do discovery à expansão LatAm.</div>
+    <div class="phases-row">
+      <div class="phase-card">
+        <div class="phase-number" style="background:rgba(255,77,0,.1);color:var(--primary)">0</div>
+        <h4>Discovery & Design</h4>
+        <div class="ph-duration">Meses 1–2 · 2 meses</div>
+        <div class="ph-invest">R$ 50.000</div>
+        <div class="ph-mrr">—</div>
+        <div class="phase-deliverables">
+          <div class="ph-item">Pesquisa com usuários</div>
+          <div class="ph-item">Design system</div>
+          <div class="ph-item">Protótipos validados</div>
+          <div class="ph-item">Time core contratado</div>
+        </div>
+      </div>
+      <div class="phase-card" style="border-color:rgba(255,77,0,.2);">
+        <div class="phase-number" style="background:rgba(255,77,0,.15);color:var(--primary)">1</div>
+        <h4>MVP B2C Core</h4>
+        <div class="ph-duration">Meses 3–6 · 4 meses</div>
+        <div class="ph-invest">R$ 250.000</div>
+        <div class="ph-mrr">MRR alvo: R$ 10K</div>
+        <div class="phase-deliverables">
+          <div class="ph-item">App iOS + Android</div>
+          <div class="ph-item">GPS + Garmin sync</div>
+          <div class="ph-item">Feed social</div>
+          <div class="ph-item">Soft launch SP/RJ</div>
+        </div>
+      </div>
+      <div class="phase-card" style="border-color:rgba(255,184,0,.2);">
+        <div class="phase-number" style="background:rgba(255,184,0,.15);color:var(--warning)">2</div>
+        <h4>Growth + MVP B2B</h4>
+        <div class="ph-duration">Meses 7–10 · 4 meses</div>
+        <div class="ph-invest">R$ 500.000</div>
+        <div class="ph-mrr">MRR alvo: R$ 150K</div>
+        <div class="phase-deliverables">
+          <div class="ph-item">Dashboard B2B</div>
+          <div class="ph-item">Eventos + inscrição</div>
+          <div class="ph-item">FitCoins + Marketplace</div>
+          <div class="ph-item">10 clientes B2B</div>
+        </div>
+      </div>
+      <div class="phase-card" style="border-color:rgba(0,212,170,.2);">
+        <div class="phase-number" style="background:rgba(0,212,170,.15);color:var(--accent)">3</div>
+        <h4>Scale & Ecosystem</h4>
+        <div class="ph-duration">Meses 11–14 · 4 meses</div>
+        <div class="ph-invest">R$ 900.000</div>
+        <div class="ph-mrr">MRR alvo: R$ 500K</div>
+        <div class="phase-deliverables">
+          <div class="ph-item">IA + Body Score</div>
+          <div class="ph-item">Analytics avançado</div>
+          <div class="ph-item">API pública</div>
+          <div class="ph-item">200K usuários</div>
+        </div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-number" style="background:rgba(138,43,226,.15);color:#8A2BE2">4</div>
+        <h4>Expansão LatAm</h4>
+        <div class="ph-duration">Meses 15–20 · 6 meses</div>
+        <div class="ph-invest">R$ 3.000.000</div>
+        <div class="ph-mrr">MRR alvo: R$ 2M</div>
+        <div class="phase-deliverables">
+          <div class="ph-item">MX · CO · AR · CL</div>
+          <div class="ph-item">Localização completa</div>
+          <div class="ph-item">Rodada Seed/Série A</div>
+          <div class="ph-item">500K usuários</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 10 — GANTT ═══════════════ -->
+<div class="slide" id="s10">
+  <div class="slide-badge">09 · Gantt</div>
+  <div class="slide-content" style="padding-bottom:100px;">
+    <div class="slide-title">Cronograma <span class="hl">detalhado</span></div>
+    <div class="slide-desc">20 meses de roadmap com todas as atividades por fase e marcos de validação.</div>
+    <div class="gantt-wrapper">
+      <table class="gantt-table">
+        <thead>
+          <tr>
+            <th>Atividade</th>
+            <!-- 20 months -->
+            <th class="gantt-gridline">M1</th><th class="gantt-gridline">M2</th>
+            <th class="gantt-quarter">M3</th><th class="gantt-gridline">M4</th><th class="gantt-gridline">M5</th><th class="gantt-gridline">M6</th>
+            <th class="gantt-quarter">M7</th><th class="gantt-gridline">M8</th><th class="gantt-gridline">M9</th><th class="gantt-gridline">M10</th>
+            <th class="gantt-quarter">M11</th><th class="gantt-gridline">M12</th><th class="gantt-gridline">M13</th><th class="gantt-gridline">M14</th>
+            <th class="gantt-quarter">M15</th><th class="gantt-gridline">M16</th><th class="gantt-gridline">M17</th><th class="gantt-gridline">M18</th><th class="gantt-gridline">M19</th><th class="gantt-gridline">M20</th>
+          </tr>
+        </thead>
+        <tbody id="gantt-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 11 — MÉTRICAS ═══════════════ -->
+<div class="slide" id="s11">
+  <div class="slide-badge">10 · Métricas de Sucesso</div>
+  <div class="slide-content">
+    <div class="slide-title">North Star <span class="hl">KPIs</span></div>
+    <div class="slide-desc">Métricas que guiam cada decisão de produto e negócio.</div>
+    <div class="kpi-grid-4">
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--primary)">D30&gt;45%</div>
+        <div class="kpi-label">Retenção</div>
+        <div class="kpi-sub">% ativos após 30 dias</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">3+</div>
+        <div class="kpi-label">Atividades/semana</div>
+        <div class="kpi-sub">por usuário ativo</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:var(--primary)">40%</div>
+        <div class="kpi-label">DAU/MAU</div>
+        <div class="kpi-sub">engajamento diário</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val">&gt;50</div>
+        <div class="kpi-label">NPS</div>
+        <div class="kpi-sub">Net Promoter Score</div>
+      </div>
+    </div>
+    <div class="kpi-grid-4">
+      <div class="kpi-card" style="border-color:rgba(0,212,170,.2);">
+        <div class="kpi-val" style="color:var(--accent)">3x</div>
+        <div class="kpi-label">LTV / CAC</div>
+        <div class="kpi-sub">unit economics saudável</div>
+      </div>
+      <div class="kpi-card" style="border-color:rgba(0,212,170,.2);">
+        <div class="kpi-val" style="color:var(--accent)">4.2x</div>
+        <div class="kpi-label">ROI B2B médio</div>
+        <div class="kpi-sub">retorno por campanha</div>
+      </div>
+      <div class="kpi-card" style="border-color:rgba(0,212,170,.2);">
+        <div class="kpi-val" style="color:var(--accent)">&lt;7d</div>
+        <div class="kpi-label">Time to value</div>
+        <div class="kpi-sub">ativação B2B</div>
+      </div>
+      <div class="kpi-card" style="border-color:rgba(0,212,170,.2);">
+        <div class="kpi-val" style="color:var(--accent)">&gt;80%</div>
+        <div class="kpi-label">Renovação B2B</div>
+        <div class="kpi-sub">taxa de retenção</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;">
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>Mês 6 — MVP</h4>
+        <p>5.000 usuários ativos · 10 empresas B2B · R$ 30K MRR</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <h4>Mês 12 — Tração</h4>
+        <p>50.000 usuários · 50 empresas · R$ 150K MRR · NPS &gt; 50</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌎</div>
+        <h4>Mês 20 — Escala</h4>
+        <p>500.000 usuários (LatAm) · 500 empresas · R$ 2M MRR</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 12 — RISCOS ═══════════════ -->
+<div class="slide" id="s12">
+  <div class="slide-badge">11 · Riscos e Mitigações</div>
+  <div class="slide-content">
+    <div class="slide-title">Riscos <span class="hl">mapeados</span></div>
+    <div class="slide-desc">Estratégias claras de contingência para os principais vetores de risco.</div>
+    <div class="risk-grid">
+      <div style="display:grid;grid-template-columns:190px 80px 80px 1fr 1fr;gap:12px;padding:0 4px;margin-bottom:4px;">
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Risco</span>
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;text-align:center;">Prob.</span>
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;text-align:center;">Impacto</span>
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Mitigação</span>
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Contingência</span>
+      </div>
+      <div class="risk-row">
+        <div class="rr-name">Cold Start</div>
+        <div><span class="risk-badge rb-high">Alta</span></div>
+        <div><span class="risk-badge rb-high">Alto</span></div>
+        <div class="rr-mit">Parceria com assessorias de corrida SP/RJ como embaixadores no lançamento</div>
+        <div class="rr-mit">Niche down — focar só em corrida de rua até atingir massa crítica</div>
+      </div>
+      <div class="risk-row">
+        <div class="rr-name">Strava como incumbente</div>
+        <div><span class="risk-badge rb-high">Alta</span></div>
+        <div><span class="risk-badge rb-med">Médio</span></div>
+        <div class="rr-mit">Integrar com Strava em vez de competir. Adicionar camadas que ele não tem</div>
+        <div class="rr-mit">Posicionar como complemento, não substituto</div>
+      </div>
+      <div class="risk-row">
+        <div class="rr-name">LGPD / dados saúde</div>
+        <div><span class="risk-badge rb-med">Média</span></div>
+        <div><span class="risk-badge rb-high">Alto</span></div>
+        <div class="rr-mit">DPO desde o dia 1. Consentimento granular. Dados B2B 100% anônimos</div>
+        <div class="rr-mit">Privacy by design na arquitetura desde o MVP</div>
+      </div>
+      <div class="risk-row">
+        <div class="rr-name">Retenção de usuários</div>
+        <div><span class="risk-badge rb-high">Alta</span></div>
+        <div><span class="risk-badge rb-high">Alto</span></div>
+        <div class="rr-mit">Gamificação + FitCoins + benefícios tangíveis (descontos reais, não virtuais)</div>
+        <div class="rr-mit">Loop de notificações para streaks e desafios com amigos</div>
+      </div>
+      <div class="risk-row">
+        <div class="rr-name">Monetização B2B lenta</div>
+        <div><span class="risk-badge rb-med">Média</span></div>
+        <div><span class="risk-badge rb-high">Alto</span></div>
+        <div class="rr-mit">Tier gratuito B2B para atrair primeiras marcas. ROI comprovado vende</div>
+        <div class="rr-mit">Eventos como prova de conceito rápida com dados reais</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 13 — PRIMEIROS 30 DIAS ═══════════════ -->
+<div class="slide" id="s13">
+  <div class="slide-badge">12 · Quick Wins</div>
+  <div class="slide-content">
+    <div class="slide-title">Primeiros <span class="hl">30 dias</span></div>
+    <div class="slide-desc">Ações imediatas para começar antes mesmo do time completo estar formado.</div>
+    <div class="days-grid">
+      <div class="day-card">
+        <div class="dc-days">Dias 1–3</div>
+        <h4>🏛️ Registro de Marca</h4>
+        <p>Protocolar registro "FitPulse" no INPI para proteção da propriedade intelectual desde o início.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 1–5</div>
+        <h4>🎨 Identidade Visual</h4>
+        <p>Logo, paleta de cores e tipografia mínima viável. Suficiente para landing page e pitch deck.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 1–7</div>
+        <h4>🌐 Landing Page + Waitlist</h4>
+        <p>Página online com formulário de waitlist para capturar interesse e validar demanda antes de construir.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 3–10</div>
+        <h4>🎤 Pesquisa com Usuários</h4>
+        <p>10 entrevistas com corredores de assessorias esportivas em SP. Validar dores e priorizar features.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 5–15</div>
+        <h4>🎯 Mapeamento B2B</h4>
+        <p>Lista com 50 marcas-alvo potenciais. Networking e primeiros contatos para o pipeline B2B.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 10–20</div>
+        <h4>🖼️ Protótipos Figma</h4>
+        <p>Wireframes e protótipos de alta fidelidade. Iterar com feedback dos primeiros entrevistados.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 15–25</div>
+        <h4>⚙️ Setup Técnico</h4>
+        <p>Repositório, CI/CD, infraestrutura base (AWS). Fundação para o Sprint 1 do desenvolvimento.</p>
+      </div>
+      <div class="day-card">
+        <div class="dc-days">Dias 20–30</div>
+        <h4>🤝 Parcerias Assessorias</h4>
+        <p>Fechar parceria com 2–3 assessorias de corrida em SP e RJ como embaixadores do beta.</p>
+      </div>
+      <div class="day-card" style="border-color:rgba(255,77,0,.25);background:rgba(255,77,0,.04);">
+        <div class="dc-days">Dia 25–30</div>
+        <h4>🚀 Sprint 1 Iniciado</h4>
+        <p>Time de desenvolvimento contratado e Sprint 1 em andamento: auth, infra, perfil do atleta.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SLIDE 14 — CLOSING ═══════════════ -->
+<div class="slide" id="s14">
+  <div class="closing-eyebrow">Visão de Longo Prazo</div>
+  <div class="closing-h1">O <span>sistema operacional</span><br>da vida fitness</div>
+  <div class="closing-sub">O lugar onde atletas vivem seu dia a dia esportivo e marcas acessam o público mais engajado e nichado do mercado.</div>
+  <div class="closing-stats">
+    <div class="cs-item">
+      <div class="cs-value" style="color:var(--primary)">20 meses</div>
+      <div class="cs-label">até LatAm</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-value">500K</div>
+      <div class="cs-label">usuários (Ano 2)</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-value" style="color:var(--accent)">R$ 2M</div>
+      <div class="cs-label">MRR (Mês 20)</div>
+    </div>
+    <div class="cs-item">
+      <div class="cs-value">4.2x</div>
+      <div class="cs-label">ROI médio B2B</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:16px;justify-content:center;">
+    <a href="app-b2c.html" style="padding:14px 28px;background:linear-gradient(135deg,#FF4D00,#FF6B2B);border-radius:10px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;">Ver App Protótipo →</a>
+    <a href="dashboard-b2b.html" style="padding:14px 28px;border:1px solid var(--border);border-radius:10px;color:var(--text-secondary);font-weight:600;font-size:14px;text-decoration:none;">Dashboard B2B →</a>
+    <a href="document.html" style="padding:14px 28px;border:1px solid var(--border);border-radius:10px;color:var(--text-secondary);font-weight:600;font-size:14px;text-decoration:none;">Documento Completo →</a>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+const TOTAL = 14;
+let current = 1;
+
+// Build nav dots
+const dotsEl = document.getElementById('nav-dots');
+for (let i = 1; i <= TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i === 1 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(n) {
+  if (n < 1 || n > TOTAL) return;
+  document.getElementById('s' + current).classList.remove('active');
+  dotsEl.children[current - 1].classList.remove('active');
+  current = n;
+  document.getElementById('s' + current).classList.add('active');
+  dotsEl.children[current - 1].classList.add('active');
+  document.getElementById('counter').textContent = current + ' / ' + TOTAL;
+  document.getElementById('progress').style.width = (current / TOTAL * 100) + '%';
+}
+
+function nextSlide() { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') nextSlide();
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.();
+});
+
+// Touch swipe
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (dx < -50) nextSlide();
+  if (dx > 50) prevSlide();
+});
+
+// ── Build Gantt ──
+const ganttData = [
+  // [label, phase-color, start(0-indexed month), span, type]
+  // type: 'phase'=full-width phase bar, 'bar'=regular, 'milestone'=dot
+  { section: 'FASE 0 — Discovery & Design' },
+  { label: 'Pesquisa com usuários',       color:'#FF4D00', start:0, span:1 },
+  { label: 'Análise competitiva',         color:'#FF4D00', start:0, span:1 },
+  { label: 'Personas e jornadas',         color:'#FF6B2B', start:1, span:1 },
+  { label: 'Design System',              color:'#FF6B2B', start:1, span:1 },
+  { label: 'Protótipos + testes',        color:'#FF8C57', start:1, span:2 },
+  { label: 'Definição técnica + time',   color:'#FF8C57', start:1, span:2 },
+
+  { section: 'FASE 1 — MVP B2C (Meses 3–6)' },
+  { label: 'Sprint 1: Setup & Auth',     color:'#FF4D00', start:2, span:1 },
+  { label: 'Sprint 2: Perfil + GPS',     color:'#FF4D00', start:2, span:1 },
+  { label: 'Sprint 3: Integrações',      color:'#FF4D00', start:3, span:1 },
+  { label: 'Sprint 4: Feed Social',      color:'#FF4D00', start:3, span:1 },
+  { label: 'Sprint 5: Dashboard Saúde',  color:'#FF6B2B', start:4, span:1 },
+  { label: 'Sprint 6: Strava Import',    color:'#FF6B2B', start:4, span:1 },
+  { label: 'Sprint 7: Comunidade',       color:'#FF6B2B', start:4, span:1 },
+  { label: 'Sprint 8: Beta + Launch 🚀', color:'#FF8C57', start:5, span:1, milestone: true },
+
+  { section: 'FASE 2 — Growth + B2B (Meses 7–10)' },
+  { label: 'Eventos + PIX',              color:'#FFB800', start:6, span:2 },
+  { label: 'FitCoins + Marketplace',     color:'#FFB800', start:6, span:2 },
+  { label: 'Dashboard B2B MVP',          color:'#E09B00', start:6, span:3 },
+  { label: 'Posts patrocinados',         color:'#E09B00', start:7, span:2 },
+  { label: 'Multi-modalidade',           color:'#FFB800', start:7, span:2 },
+  { label: 'Primeiros 10 clientes B2B 🎯',color:'#E09B00', start:9, span:1, milestone:true },
+
+  { section: 'FASE 3 — Scale & Ecosystem (Meses 11–14)' },
+  { label: 'IA + Body Score',            color:'#00D4AA', start:10, span:2 },
+  { label: 'Analytics avançado B2B',     color:'#00D4AA', start:10, span:3 },
+  { label: 'API pública',                color:'#00B894', start:11, span:2 },
+  { label: 'Compliance LGPD auditado',   color:'#00B894', start:11, span:2 },
+  { label: 'Apple Watch App',            color:'#00D4AA', start:12, span:2 },
+  { label: '200K usuários 🎯',           color:'#00D4AA', start:13, span:1, milestone:true },
+
+  { section: 'FASE 4 — Expansão LatAm (Meses 15–20)' },
+  { label: 'Localização MX + CO',        color:'#8A2BE2', start:14, span:3 },
+  { label: 'Localização AR + CL',        color:'#8A2BE2', start:15, span:3 },
+  { label: 'Time comercial local',       color:'#7B2FBE', start:14, span:4 },
+  { label: 'Série A / Seed 💰',          color:'#8A2BE2', start:17, span:2, milestone:true },
+  { label: '500K usuários 🌎',           color:'#8A2BE2', start:19, span:1, milestone:true },
+];
+
+const tbody = document.getElementById('gantt-body');
+ganttData.forEach(row => {
+  const tr = document.createElement('tr');
+  if (row.section) {
+    tr.className = 'gantt-row-header';
+    tr.innerHTML = `<td colspan="21">${row.section}</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+  tr.className = 'gantt-row';
+  let cells = `<td class="gantt-label">${row.label}</td>`;
+  for (let m = 0; m < 20; m++) {
+    if (m === row.start) {
+      const w = (row.span * 100) + '%';
+      const isMilestone = row.milestone;
+      cells += `<td class="gantt-cell" colspan="${row.span}">
+        <div class="gantt-bar" style="background:${row.color};left:1px;right:1px;${isMilestone ? 'box-shadow:0 0 8px '+row.color+'80;' : ''}">
+          ${isMilestone ? '⬟' : ''}
+        </div>
+      </td>`;
+      m += row.span - 1;
+    } else {
+      cells += `<td class="gantt-cell ${m%3===2?'gantt-quarter':'gantt-gridline'}"></td>`;
+    }
+  }
+  tr.innerHTML = cells;
+  tbody.appendChild(tr);
+});
+
+// Init progress
+document.getElementById('progress').style.width = (1 / TOTAL * 100) + '%';
+</script>
+</body>
+</html>

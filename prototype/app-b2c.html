@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FitPulse — App Protótipo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --primary: #FF4D00;
+    --primary-dark: #E04400;
+    --primary-light: #FF6B2B;
+    --accent: #00D4AA;
+    --accent-dark: #00B894;
+    --bg: #0A0A0F;
+    --bg-card: #14141F;
+    --bg-card-hover: #1A1A28;
+    --bg-input: #1E1E2E;
+    --text: #FFFFFF;
+    --text-secondary: #8B8BA3;
+    --text-muted: #55556A;
+    --border: #2A2A3C;
+    --success: #00D4AA;
+    --warning: #FFB800;
+    --danger: #FF4757;
+    --gradient-primary: linear-gradient(135deg, #FF4D00, #FF6B2B);
+    --gradient-accent: linear-gradient(135deg, #00D4AA, #00B894);
+    --gradient-card: linear-gradient(145deg, #14141F, #1A1A28);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 3px #1a1a2e, 0 0 0 6px #0d0d15, 0 20px 60px rgba(0,0,0,0.8);
+  }
+
+  .status-bar {
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+    z-index: 100;
+    background: var(--bg);
+  }
+  .status-bar .notch {
+    width: 126px;
+    height: 34px;
+    background: #000;
+    border-radius: 0 0 20px 20px;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: white; }
+
+  .screen {
+    display: none;
+    height: calc(100% - 54px - 80px);
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { display: block; }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 10px;
+    border-top: 1px solid var(--border);
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-item svg { width: 24px; height: 24px; fill: var(--text-muted); transition: fill 0.2s; }
+  .nav-item span { font-size: 10px; color: var(--text-muted); font-weight: 500; transition: color 0.2s; }
+  .nav-item.active svg { fill: var(--primary); }
+  .nav-item.active span { color: var(--primary); }
+  .nav-item-record {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -15px;
+    box-shadow: 0 4px 20px rgba(255,77,0,0.4);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .nav-item-record:active { transform: scale(0.92); }
+  .nav-item-record svg { fill: white; width: 26px; height: 26px; }
+
+  /* ===== FEED SCREEN ===== */
+  .feed-header {
+    padding: 10px 20px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10, 10, 15, 0.92);
+    backdrop-filter: blur(20px);
+    z-index: 50;
+  }
+  .feed-logo {
+    font-size: 22px;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .feed-header-icons { display: flex; gap: 16px; }
+  .feed-header-icons svg { width: 22px; height: 22px; fill: var(--text-secondary); cursor: pointer; }
+
+  .stories-row {
+    display: flex;
+    gap: 14px;
+    padding: 10px 20px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .stories-row::-webkit-scrollbar { display: none; }
+  .story-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .story-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    padding: 2px;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .story-avatar.add-story { background: var(--border); }
+  .story-avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    overflow: hidden;
+  }
+  .story-name { font-size: 11px; color: var(--text-secondary); max-width: 62px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Challenge Banner */
+  .challenge-banner {
+    margin: 0 20px 16px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #FF4D00 0%, #FF6B2B 50%, #FFB800 100%);
+    border-radius: 16px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .challenge-banner::after {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+  .challenge-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.85; margin-bottom: 6px; }
+  .challenge-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .challenge-subtitle { font-size: 12px; opacity: 0.8; }
+  .challenge-progress-bar { height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-top: 12px; }
+  .challenge-progress-fill { height: 100%; background: white; border-radius: 2px; width: 68%; }
+
+  /* Feed Cards */
+  .feed-card {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .feed-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .feed-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .feed-user-info { flex: 1; }
+  .feed-user-name { font-size: 14px; font-weight: 600; }
+  .feed-user-meta { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .feed-card-type {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,77,0,0.15);
+    color: var(--primary);
+  }
+  .feed-card-type.cycling { background: rgba(0,212,170,0.15); color: var(--accent); }
+  .feed-card-type.gym { background: rgba(255,184,0,0.15); color: var(--warning); }
+  .feed-card-type.sponsored {
+    background: rgba(255,77,0,0.1);
+    color: var(--primary-light);
+    border: 1px solid rgba(255,77,0,0.2);
+  }
+
+  .feed-activity-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+
+  .feed-map {
+    width: 100%;
+    height: 160px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    background: #0d1117;
+  }
+  .feed-map svg { width: 100%; height: 100%; }
+
+  .feed-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .feed-stat {
+    text-align: center;
+    padding: 10px 0;
+    background: var(--bg-input);
+    border-radius: 10px;
+  }
+  .feed-stat-value { font-size: 18px; font-weight: 700; }
+  .feed-stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  .feed-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 8px;
+  }
+  .feed-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .feed-action svg { width: 20px; height: 20px; fill: var(--text-secondary); transition: all 0.2s; }
+  .feed-action span { font-size: 13px; color: var(--text-secondary); }
+  .feed-action.liked svg { fill: var(--primary); }
+  .feed-action.liked span { color: var(--primary); }
+
+  /* Sponsored Post */
+  .sponsored-card {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,77,0,0.03) 0%, transparent 100%);
+  }
+  .sponsored-image {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1a28, #2a2a3c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sponsored-image-content {
+    text-align: center;
+  }
+  .sponsored-image-content .brand-icon { font-size: 40px; margin-bottom: 8px; }
+  .sponsored-image-content .brand-text { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+  .sponsored-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--gradient-primary);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* ===== ACTIVITY / RECORD SCREEN ===== */
+  .record-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg);
+    position: relative;
+  }
+  .record-header {
+    text-align: center;
+    padding: 20px 20px 10px;
+  }
+  .record-sport-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 20px 20px;
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+  .record-sport-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .record-sport-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  .record-map-area {
+    flex: 1;
+    background: #0d1117;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+  }
+  .record-map-placeholder {
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .record-map-placeholder svg { width: 60px; height: 60px; fill: var(--text-muted); margin-bottom: 10px; }
+  .record-map-placeholder p { font-size: 14px; }
+
+  .record-live-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 20px;
+    gap: 12px;
+  }
+  .record-live-stat { text-align: center; }
+  .record-live-stat .value { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .record-live-stat .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  .record-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 10px 20px 24px;
+  }
+  .record-btn-start {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 30px rgba(255,77,0,0.5);
+    transition: transform 0.15s;
+    border: none;
+  }
+  .record-btn-start:active { transform: scale(0.93); }
+  .record-btn-start svg { width: 30px; height: 30px; fill: white; }
+  .record-btn-secondary {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .record-btn-secondary svg { width: 20px; height: 20px; fill: var(--text-secondary); }
+
+  /* ===== HEALTH SCREEN ===== */
+  .health-header {
+    padding: 16px 20px 0;
+  }
+  .health-header h2 { font-size: 24px; font-weight: 800; }
+  .health-header p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  .body-score-card {
+    margin: 16px 20px;
+    padding: 24px;
+    background: var(--gradient-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .body-score-ring {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .body-score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .body-score-ring .score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .body-score-ring .score-number { font-size: 40px; font-weight: 900; display: block; }
+  .body-score-ring .score-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+  .body-score-subtitle { font-size: 14px; color: var(--accent); font-weight: 600; }
+  .body-score-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .health-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 20px 20px;
+  }
+  .health-metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .health-metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .health-metric-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .health-metric-icon.heart { background: rgba(255,71,87,0.15); }
+  .health-metric-icon.heart svg { fill: var(--danger); }
+  .health-metric-icon.sleep { background: rgba(138,43,226,0.15); }
+  .health-metric-icon.sleep svg { fill: #8A2BE2; }
+  .health-metric-icon.stress { background: rgba(255,184,0,0.15); }
+  .health-metric-icon.stress svg { fill: var(--warning); }
+  .health-metric-icon.steps { background: rgba(0,212,170,0.15); }
+  .health-metric-icon.steps svg { fill: var(--accent); }
+  .health-metric-icon svg { width: 18px; height: 18px; }
+  .health-metric-trend { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  .health-metric-trend.up { background: rgba(0,212,170,0.15); color: var(--accent); }
+  .health-metric-trend.down { background: rgba(255,71,87,0.15); color: var(--danger); }
+  .health-metric-value { font-size: 24px; font-weight: 800; }
+  .health-metric-unit { font-size: 12px; color: var(--text-secondary); font-weight: 400; }
+  .health-metric-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .health-metric-chart {
+    height: 40px;
+    margin-top: 10px;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .health-metric-bar {
+    flex: 1;
+    border-radius: 2px;
+    transition: height 0.3s;
+    min-height: 4px;
+  }
+
+  .weekly-summary {
+    margin: 0 20px 20px;
+    padding: 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .weekly-summary h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+  .weekly-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .weekly-summary-row:last-child { border: none; }
+  .weekly-summary-row .label { font-size: 13px; color: var(--text-secondary); }
+  .weekly-summary-row .value { font-size: 14px; font-weight: 700; }
+
+  /* ===== EVENTS SCREEN ===== */
+  .events-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .events-header h2 { font-size: 24px; font-weight: 800; }
+  .events-filter-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+    overflow-x: auto;
+  }
+  .events-filter-row::-webkit-scrollbar { display: none; }
+  .events-filter-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .events-filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  .event-card {
+    margin: 0 20px 14px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .event-card:active { transform: scale(0.98); }
+  .event-card-image {
+    height: 120px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .event-card-image .event-icon { font-size: 36px; }
+  .event-card-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .event-card-badge.hot { background: var(--danger); color: white; }
+  .event-card-badge.new { background: var(--accent); color: var(--bg); }
+  .event-card-body { padding: 14px 16px; }
+  .event-card-date { font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 4px; }
+  .event-card-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .event-card-location { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+  .event-card-location svg { width: 14px; height: 14px; fill: var(--text-secondary); }
+  .event-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .event-card-price { font-size: 16px; font-weight: 800; color: var(--accent); }
+  .event-card-participants { font-size: 12px; color: var(--text-secondary); }
+  .event-card-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    background: var(--gradient-primary);
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* ===== PROFILE SCREEN ===== */
+  .profile-cover {
+    height: 140px;
+    background: linear-gradient(135deg, #FF4D00, #FF6B2B, #FFB800);
+    position: relative;
+  }
+  .profile-avatar-section {
+    text-align: center;
+    margin-top: -46px;
+    padding: 0 20px;
+  }
+  .profile-avatar-lg {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 4px solid var(--bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .profile-name { font-size: 22px; font-weight: 800; }
+  .profile-handle { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .profile-bio { font-size: 13px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4; }
+
+  .profile-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 18px 20px;
+    margin: 12px 20px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  .profile-stat { text-align: center; }
+  .profile-stat .value { font-size: 20px; font-weight: 800; }
+  .profile-stat .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .profile-level-card {
+    margin: 0 20px 14px;
+    padding: 16px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .profile-level-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .profile-level-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .profile-level-badge .icon { font-size: 20px; }
+  .profile-level-xp { font-size: 12px; color: var(--text-secondary); }
+  .profile-level-bar { height: 6px; background: var(--bg-input); border-radius: 3px; }
+  .profile-level-bar-fill { height: 100%; background: var(--gradient-primary); border-radius: 3px; width: 72%; }
+
+  .profile-fitcoins {
+    margin: 0 20px 14px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, rgba(255,184,0,0.1), rgba(255,77,0,0.1));
+    border: 1px solid rgba(255,184,0,0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .fitcoins-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fitcoins-icon { font-size: 28px; }
+  .fitcoins-label { font-size: 12px; color: var(--text-secondary); }
+  .fitcoins-value { font-size: 20px; font-weight: 800; color: var(--warning); }
+  .fitcoins-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(255,184,0,0.2);
+    color: var(--warning);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+  }
+
+  .profile-badges {
+    padding: 0 20px 16px;
+  }
+  .profile-badges h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .badges-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+  }
+  .badges-row::-webkit-scrollbar { display: none; }
+  .badge-item {
+    flex-shrink: 0;
+    width: 70px;
+    text-align: center;
+  }
+  .badge-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 6px;
+  }
+  .badge-icon.earned { border-color: var(--primary); background: rgba(255,77,0,0.1); }
+  .badge-name { font-size: 10px; color: var(--text-secondary); }
+
+  .profile-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    padding: 0 20px;
+    margin-bottom: 12px;
+  }
+  .profile-recent-activity {
+    padding: 0 20px 100px;
+  }
+  .mini-activity-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+  }
+  .mini-activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .mini-activity-icon.run { background: rgba(255,77,0,0.15); }
+  .mini-activity-icon.bike { background: rgba(0,212,170,0.15); }
+  .mini-activity-icon.gym { background: rgba(255,184,0,0.15); }
+  .mini-activity-info { flex: 1; }
+  .mini-activity-title { font-size: 13px; font-weight: 600; }
+  .mini-activity-meta { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .mini-activity-stat { text-align: right; }
+  .mini-activity-stat .value { font-size: 15px; font-weight: 700; }
+  .mini-activity-stat .unit { font-size: 10px; color: var(--text-secondary); }
+
+  /* Wearable Connection Badges */
+  .connected-devices {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+    flex-wrap: wrap;
+  }
+  .device-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .device-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+  }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feed-card, .event-card, .health-metric-card {
+    animation: fadeInUp 0.4s ease-out;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="notch"></div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4zM13 18h-2v-2h2v2zm0-4h-2V9h2v5z"/></svg>
+    </div>
+  </div>
+
+  <!-- ===== FEED SCREEN ===== -->
+  <div class="screen active" id="screen-feed">
+    <div class="feed-header">
+      <div class="feed-logo">FitPulse</div>
+      <div class="feed-header-icons">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+      </div>
+    </div>
+
+    <!-- Stories -->
+    <div class="stories-row">
+      <div class="story-item">
+        <div class="story-avatar add-story">
+          <div class="story-avatar-inner" style="font-size:24px; color: var(--text-muted);">+</div>
+        </div>
+        <span class="story-name">Seu story</span>
+      </div>
+      <div class="story-item">
+        <div class="story-avatar"><div class="story-avatar-inner" style="background: #2d1f3d;">MR</div></div>
+        <span class="story-name">Marina R.</span>
+      </div>
+      <div class="story-item">
+        <div class="story-avatar"><div class="story-avatar-inner" style="background: #1f2d3d;">CA</div></div>
+        <span class="story-name">Carlos A.</span>
+      </div>
+      <div class="story-item">
+        <div class="story-avatar" style="background: var(--gradient-accent);"><div class="story-avatar-inner" style="background: #1f3d2d;">LS</div></div>
+        <span class="story-name">Lucia S.</span>
+      </div>
+      <div class="story-item">
+        <div class="story-avatar"><div class="story-avatar-inner" style="background: #3d2d1f;">PF</div></div>
+        <span class="story-name">Pedro F.</span>
+      </div>
+      <div class="story-item">
+        <div class="story-avatar"><div class="story-avatar-inner" style="background: #1f3d3d;">AS</div></div>
+        <span class="story-name">Ana S.</span>
+      </div>
+    </div>
+
+    <!-- Challenge Banner -->
+    <div class="challenge-banner">
+      <div class="challenge-tag">Desafio do Mês</div>
+      <div class="challenge-title">Corra 100km em Abril</div>
+      <div class="challenge-subtitle">2.847 participantes  ·  68km concluídos</div>
+      <div class="challenge-progress-bar"><div class="challenge-progress-fill"></div></div>
+    </div>
+
+    <!-- Feed Card 1 — Running Activity -->
+    <div class="feed-card">
+      <div class="feed-card-header">
+        <div class="feed-avatar">MR</div>
+        <div class="feed-user-info">
+          <div class="feed-user-name">Marina Rodrigues</div>
+          <div class="feed-user-meta">Hoje às 07:32 · Garmin Forerunner 265</div>
+        </div>
+        <div class="feed-card-type">Corrida</div>
+      </div>
+      <div class="feed-activity-title">Treino intervalado na Ibirapuera 🔥</div>
+      <div class="feed-map">
+        <svg viewBox="0 0 350 160" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#FF4D00;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#FFB800;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <rect fill="#0d1117" width="350" height="160"/>
+          <path d="M20,130 Q40,120 60,110 Q80,90 110,85 Q140,80 170,60 Q200,40 230,50 Q260,65 280,45 Q300,30 330,40" fill="none" stroke="url(#routeGrad)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="20" cy="130" r="4" fill="#00D4AA"/>
+          <circle cx="330" cy="40" r="4" fill="#FF4D00"/>
+          <text x="175" y="150" fill="#55556A" font-size="11" text-anchor="middle" font-family="Inter">Parque Ibirapuera, São Paulo</text>
+        </svg>
+      </div>
+      <div class="feed-stats">
+        <div class="feed-stat">
+          <div class="feed-stat-value">8.2<span style="font-size:12px; color: var(--text-secondary);"> km</span></div>
+          <div class="feed-stat-label">Distância</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">5'24"<span style="font-size:12px; color: var(--text-secondary);">/km</span></div>
+          <div class="feed-stat-label">Pace Médio</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">44:18</div>
+          <div class="feed-stat-label">Tempo</div>
+        </div>
+      </div>
+      <div class="feed-actions">
+        <div class="feed-action liked" onclick="this.classList.toggle('liked')">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>24</span>
+        </div>
+        <div class="feed-action">
+          <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+          <span>6</span>
+        </div>
+        <div class="feed-action" style="margin-left: auto;">
+          <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sponsored Post -->
+    <div class="sponsored-card">
+      <div class="feed-card-header">
+        <div class="feed-avatar" style="background: linear-gradient(135deg, #1a1a28, #2a2a3c); color: var(--accent);">NB</div>
+        <div class="feed-user-info">
+          <div class="feed-user-name">New Balance Running</div>
+          <div class="feed-user-meta">Patrocinado</div>
+        </div>
+        <div class="feed-card-type sponsored">Ad</div>
+      </div>
+      <div class="sponsored-image" style="background: linear-gradient(135deg, #1a1a28, #2a2a3c);">
+        <div class="sponsored-image-content">
+          <div class="brand-icon">👟</div>
+          <div class="brand-text">FuelCell SuperComp Elite v4</div>
+          <div style="font-size: 20px; font-weight: 800; margin-top: 8px; color: var(--accent);">15% OFF para membros FitPulse</div>
+        </div>
+      </div>
+      <div class="feed-activity-title">Novo FuelCell SuperComp Elite v4 🏃‍♂️</div>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">Projetado para quebrar recordes. Membros FitPulse têm 15% de desconto exclusivo. Use o cupom FITPULSE15.</p>
+      <div class="sponsored-cta">Ver oferta →</div>
+      <div class="feed-actions" style="margin-top: 12px;">
+        <div class="feed-action" onclick="this.classList.toggle('liked')">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>142</span>
+        </div>
+        <div class="feed-action">
+          <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+          <span>28</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Card 2 — Cycling -->
+    <div class="feed-card">
+      <div class="feed-card-header">
+        <div class="feed-avatar" style="color: var(--accent);">CA</div>
+        <div class="feed-user-info">
+          <div class="feed-user-name">Carlos Almeida</div>
+          <div class="feed-user-meta">Ontem às 17:15 · COROS PACE 3</div>
+        </div>
+        <div class="feed-card-type cycling">Ciclismo</div>
+      </div>
+      <div class="feed-activity-title">Pedal na Marginal com o grupo 🚴</div>
+      <div class="feed-stats">
+        <div class="feed-stat">
+          <div class="feed-stat-value">42.5<span style="font-size:12px; color: var(--text-secondary);"> km</span></div>
+          <div class="feed-stat-label">Distância</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">28.3<span style="font-size:12px; color: var(--text-secondary);"> km/h</span></div>
+          <div class="feed-stat-label">Vel. Média</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">1:30:12</div>
+          <div class="feed-stat-label">Tempo</div>
+        </div>
+      </div>
+      <div class="feed-actions">
+        <div class="feed-action" onclick="this.classList.toggle('liked')">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>18</span>
+        </div>
+        <div class="feed-action">
+          <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+          <span>3</span>
+        </div>
+        <div class="feed-action" style="margin-left: auto;">
+          <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Card 3 — Gym -->
+    <div class="feed-card" style="padding-bottom: 100px;">
+      <div class="feed-card-header">
+        <div class="feed-avatar" style="color: var(--warning);">LS</div>
+        <div class="feed-user-info">
+          <div class="feed-user-name">Lucia Santos</div>
+          <div class="feed-user-meta">Ontem às 08:45 · Apple Watch Ultra</div>
+        </div>
+        <div class="feed-card-type gym">Academia</div>
+      </div>
+      <div class="feed-activity-title">Treino de pernas + 20min HIIT 💪</div>
+      <div class="feed-stats">
+        <div class="feed-stat">
+          <div class="feed-stat-value">487<span style="font-size:12px; color: var(--text-secondary);"> cal</span></div>
+          <div class="feed-stat-label">Calorias</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">1:15:00</div>
+          <div class="feed-stat-label">Tempo</div>
+        </div>
+        <div class="feed-stat">
+          <div class="feed-stat-value">152<span style="font-size:12px; color: var(--text-secondary);"> bpm</span></div>
+          <div class="feed-stat-label">FC Média</div>
+        </div>
+      </div>
+      <div class="feed-actions">
+        <div class="feed-action" onclick="this.classList.toggle('liked')">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>31</span>
+        </div>
+        <div class="feed-action">
+          <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+          <span>8</span>
+        </div>
+        <div class="feed-action" style="margin-left: auto;">
+          <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RECORD SCREEN ===== -->
+  <div class="screen" id="screen-record">
+    <div class="record-screen">
+      <div class="record-header">
+        <h2 style="font-size: 20px; font-weight: 800;">Registrar Atividade</h2>
+      </div>
+      <div class="record-sport-selector">
+        <div class="record-sport-btn active">🏃 Corrida</div>
+        <div class="record-sport-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">🚴 Ciclismo</div>
+        <div class="record-sport-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">🏋️ Academia</div>
+        <div class="record-sport-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">🏊 Natação</div>
+        <div class="record-sport-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">🥾 Trilha</div>
+      </div>
+      <div class="record-map-area">
+        <div class="record-map-placeholder">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <p>Aguardando GPS...</p>
+          <p style="font-size: 12px; margin-top: 4px;">Sua rota aparecerá aqui</p>
+        </div>
+      </div>
+      <div class="record-live-stats">
+        <div class="record-live-stat">
+          <div class="value">0.00</div>
+          <div class="label">km</div>
+        </div>
+        <div class="record-live-stat">
+          <div class="value">0:00</div>
+          <div class="label">Tempo</div>
+        </div>
+        <div class="record-live-stat">
+          <div class="value">--'--"</div>
+          <div class="label">Pace</div>
+        </div>
+      </div>
+      <div class="record-controls">
+        <div class="record-btn-secondary">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <button class="record-btn-start" id="btn-start" onclick="toggleRecording()">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="record-btn-secondary">
+          <svg viewBox="0 0 24 24"><path d="M18 3.5v17l-6-3.2-6 3.2v-17H18zM18 1.5H6c-1.1 0-2 .9-2 2v17l8-4.27L20 20.5v-17c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HEALTH SCREEN ===== -->
+  <div class="screen" id="screen-health">
+    <div class="health-header">
+      <h2>Minha Saúde</h2>
+      <p>Dados sincronizados do Garmin Forerunner 265</p>
+    </div>
+
+    <!-- Body Score -->
+    <div class="body-score-card">
+      <div class="body-score-ring">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="6"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="url(#scoreGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="58"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#FF4D00"/>
+              <stop offset="100%" style="stop-color:#00D4AA"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="score-text">
+          <span class="score-number">78</span>
+          <span class="score-label">Body Score</span>
+        </div>
+      </div>
+      <div class="body-score-subtitle">Pronto para treinar</div>
+      <div class="body-score-desc">Boa recuperação noturna. HRV acima da média.</div>
+    </div>
+
+    <!-- Health Metrics Grid -->
+    <div class="health-metrics-grid">
+      <div class="health-metric-card">
+        <div class="health-metric-header">
+          <div class="health-metric-icon heart"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+          <span class="health-metric-trend down">-3</span>
+        </div>
+        <div class="health-metric-value">58 <span class="health-metric-unit">bpm</span></div>
+        <div class="health-metric-label">FC Repouso</div>
+        <div class="health-metric-chart">
+          <div class="health-metric-bar" style="height: 65%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 70%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 60%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 75%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 68%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 62%; background: var(--danger);"></div>
+          <div class="health-metric-bar" style="height: 58%; background: var(--danger);"></div>
+        </div>
+      </div>
+
+      <div class="health-metric-card">
+        <div class="health-metric-header">
+          <div class="health-metric-icon sleep"><svg viewBox="0 0 24 24"><path d="M9.5 2c-1.82 0-3.53.5-5 1.35 2.99 1.73 5 4.95 5 8.65s-2.01 6.92-5 8.65C5.97 21.5 7.68 22 9.5 22c5.52 0 10-4.48 10-10S15.02 2 9.5 2z"/></svg></div>
+          <span class="health-metric-trend up">+8%</span>
+        </div>
+        <div class="health-metric-value">7h42</div>
+        <div class="health-metric-label">Sono</div>
+        <div class="health-metric-chart">
+          <div class="health-metric-bar" style="height: 55%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 80%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 65%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 90%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 70%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 85%; background: #8A2BE2;"></div>
+          <div class="health-metric-bar" style="height: 78%; background: #8A2BE2;"></div>
+        </div>
+      </div>
+
+      <div class="health-metric-card">
+        <div class="health-metric-header">
+          <div class="health-metric-icon stress"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+          <span class="health-metric-trend up">Baixo</span>
+        </div>
+        <div class="health-metric-value">28 <span class="health-metric-unit">pts</span></div>
+        <div class="health-metric-label">Estresse</div>
+        <div class="health-metric-chart">
+          <div class="health-metric-bar" style="height: 40%; background: var(--warning);"></div>
+          <div class="health-metric-bar" style="height: 55%; background: var(--warning);"></div>
+          <div class="health-metric-bar" style="height: 35%; background: var(--warning);"></div>
+          <div class="health-metric-bar" style="height: 30%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 45%; background: var(--warning);"></div>
+          <div class="health-metric-bar" style="height: 25%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 28%; background: var(--accent);"></div>
+        </div>
+      </div>
+
+      <div class="health-metric-card">
+        <div class="health-metric-header">
+          <div class="health-metric-icon steps"><svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></div>
+          <span class="health-metric-trend up">+12%</span>
+        </div>
+        <div class="health-metric-value">9.847</div>
+        <div class="health-metric-label">Passos Hoje</div>
+        <div class="health-metric-chart">
+          <div class="health-metric-bar" style="height: 60%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 85%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 50%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 95%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 70%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 80%; background: var(--accent);"></div>
+          <div class="health-metric-bar" style="height: 75%; background: var(--accent);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Summary -->
+    <div class="weekly-summary">
+      <h3>Resumo da Semana</h3>
+      <div class="weekly-summary-row">
+        <span class="label">Atividades</span>
+        <span class="value">5</span>
+      </div>
+      <div class="weekly-summary-row">
+        <span class="label">Distância total</span>
+        <span class="value">38.7 km</span>
+      </div>
+      <div class="weekly-summary-row">
+        <span class="label">Tempo ativo</span>
+        <span class="value">4h 32min</span>
+      </div>
+      <div class="weekly-summary-row">
+        <span class="label">Calorias queimadas</span>
+        <span class="value">2.847 kcal</span>
+      </div>
+      <div class="weekly-summary-row">
+        <span class="label">VO2max estimado</span>
+        <span class="value" style="color: var(--accent);">48.2 ml/kg/min</span>
+      </div>
+      <div class="weekly-summary-row">
+        <span class="label">HRV média noturna</span>
+        <span class="value">52 ms</span>
+      </div>
+    </div>
+
+    <div style="height: 100px;"></div>
+  </div>
+
+  <!-- ===== EVENTS SCREEN ===== -->
+  <div class="screen" id="screen-events">
+    <div class="events-header">
+      <h2>Eventos</h2>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="var(--text-secondary)" style="cursor:pointer"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </div>
+
+    <div class="events-filter-row">
+      <div class="events-filter-btn active">Todos</div>
+      <div class="events-filter-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">Corrida</div>
+      <div class="events-filter-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">Ciclismo</div>
+      <div class="events-filter-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">Trilha</div>
+      <div class="events-filter-btn" onclick="this.parentNode.querySelector('.active').classList.remove('active'); this.classList.add('active')">Funcional</div>
+    </div>
+
+    <!-- Event Cards -->
+    <div class="event-card">
+      <div class="event-card-image" style="background: linear-gradient(135deg, #FF4D00, #FF6B2B);">
+        <span class="event-icon">🏃‍♂️</span>
+        <div class="event-card-badge hot">Lotando</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-date">20 ABR 2026 · Domingo · 06:30</div>
+        <div class="event-card-title">Meia Maratona Internacional de SP</div>
+        <div class="event-card-location">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Parque Ibirapuera, São Paulo - SP
+        </div>
+        <div class="event-card-footer">
+          <div>
+            <div class="event-card-price">R$ 189,00</div>
+            <div class="event-card-participants">2.340 inscritos</div>
+          </div>
+          <button class="event-card-btn">Inscrever-se</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="event-card-image" style="background: linear-gradient(135deg, #00D4AA, #00B894);">
+        <span class="event-icon">🚴</span>
+        <div class="event-card-badge new">Novo</div>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-date">04 MAI 2026 · Sábado · 07:00</div>
+        <div class="event-card-title">Gran Fondo Serra da Cantareira</div>
+        <div class="event-card-location">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Serra da Cantareira, São Paulo - SP
+        </div>
+        <div class="event-card-footer">
+          <div>
+            <div class="event-card-price">R$ 240,00</div>
+            <div class="event-card-participants">856 inscritos</div>
+          </div>
+          <button class="event-card-btn">Inscrever-se</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <div class="event-card-image" style="background: linear-gradient(135deg, #FFB800, #FF8C00);">
+        <span class="event-icon">🏔️</span>
+      </div>
+      <div class="event-card-body">
+        <div class="event-card-date">18 MAI 2026 · Domingo · 05:30</div>
+        <div class="event-card-title">Ultra Trail Petrópolis 50K</div>
+        <div class="event-card-location">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Petrópolis, Rio de Janeiro - RJ
+        </div>
+        <div class="event-card-footer">
+          <div>
+            <div class="event-card-price">R$ 320,00</div>
+            <div class="event-card-participants">412 inscritos</div>
+          </div>
+          <button class="event-card-btn">Inscrever-se</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 100px;"></div>
+  </div>
+
+  <!-- ===== PROFILE SCREEN ===== -->
+  <div class="screen" id="screen-profile">
+    <div class="profile-cover"></div>
+    <div class="profile-avatar-section">
+      <div class="profile-avatar-lg">RP</div>
+      <div class="profile-name">Rafael Pereira</div>
+      <div class="profile-handle">@rafaelpereira</div>
+      <div class="profile-bio">Corredor de rua | 3x maratonista | Garmin addict 🏃‍♂️⌚</div>
+    </div>
+
+    <div class="connected-devices">
+      <div class="device-badge"><span class="dot"></span> Garmin FR 265</div>
+      <div class="device-badge"><span class="dot"></span> Strava</div>
+      <div class="device-badge"><span class="dot" style="background: var(--warning);"></span> Apple Health</div>
+    </div>
+
+    <div class="profile-stats-row">
+      <div class="profile-stat">
+        <div class="value">342</div>
+        <div class="label">Atividades</div>
+      </div>
+      <div class="profile-stat">
+        <div class="value">2.847</div>
+        <div class="label">km Total</div>
+      </div>
+      <div class="profile-stat">
+        <div class="value">1.2k</div>
+        <div class="label">Seguidores</div>
+      </div>
+      <div class="profile-stat">
+        <div class="value">847</div>
+        <div class="label">Seguindo</div>
+      </div>
+    </div>
+
+    <!-- Level -->
+    <div class="profile-level-card">
+      <div class="profile-level-header">
+        <div class="profile-level-badge"><span class="icon">⚡</span> Nível 24 — Maratonista</div>
+        <div class="profile-level-xp">7.200 / 10.000 XP</div>
+      </div>
+      <div class="profile-level-bar"><div class="profile-level-bar-fill"></div></div>
+    </div>
+
+    <!-- FitCoins -->
+    <div class="profile-fitcoins">
+      <div class="fitcoins-info">
+        <span class="fitcoins-icon">🪙</span>
+        <div>
+          <div class="fitcoins-label">FitCoins</div>
+          <div class="fitcoins-value">2.450</div>
+        </div>
+      </div>
+      <button class="fitcoins-btn">Resgatar →</button>
+    </div>
+
+    <!-- Badges -->
+    <div class="profile-badges">
+      <h3>Conquistas</h3>
+      <div class="badges-row">
+        <div class="badge-item">
+          <div class="badge-icon earned">🏅</div>
+          <span class="badge-name">100km Mês</span>
+        </div>
+        <div class="badge-item">
+          <div class="badge-icon earned">🔥</div>
+          <span class="badge-name">30 dias streak</span>
+        </div>
+        <div class="badge-item">
+          <div class="badge-icon earned">🏔️</div>
+          <span class="badge-name">Montanhista</span>
+        </div>
+        <div class="badge-item">
+          <div class="badge-icon earned">⚡</div>
+          <span class="badge-name">Sub 5min/km</span>
+        </div>
+        <div class="badge-item">
+          <div class="badge-icon">🎯</div>
+          <span class="badge-name">1000km Ano</span>
+        </div>
+        <div class="badge-item">
+          <div class="badge-icon">👑</div>
+          <span class="badge-name">Ultra Runner</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="profile-section-title">Atividades Recentes</div>
+    <div class="profile-recent-activity">
+      <div class="mini-activity-card">
+        <div class="mini-activity-icon run">🏃</div>
+        <div class="mini-activity-info">
+          <div class="mini-activity-title">Corrida matinal</div>
+          <div class="mini-activity-meta">Hoje · 07:30 · Ibirapuera</div>
+        </div>
+        <div class="mini-activity-stat">
+          <div class="value">8.2</div>
+          <div class="unit">km</div>
+        </div>
+      </div>
+      <div class="mini-activity-card">
+        <div class="mini-activity-icon gym">🏋️</div>
+        <div class="mini-activity-info">
+          <div class="mini-activity-title">Treino de força</div>
+          <div class="mini-activity-meta">Ontem · 18:00 · Smart Fit</div>
+        </div>
+        <div class="mini-activity-stat">
+          <div class="value">1:10</div>
+          <div class="unit">hora</div>
+        </div>
+      </div>
+      <div class="mini-activity-card">
+        <div class="mini-activity-icon run">🏃</div>
+        <div class="mini-activity-info">
+          <div class="mini-activity-title">Longão de domingo</div>
+          <div class="mini-activity-meta">Dom · 06:00 · Marginal</div>
+        </div>
+        <div class="mini-activity-stat">
+          <div class="value">16.3</div>
+          <div class="unit">km</div>
+        </div>
+      </div>
+      <div class="mini-activity-card">
+        <div class="mini-activity-icon bike">🚴</div>
+        <div class="mini-activity-info">
+          <div class="mini-activity-title">Pedal leve</div>
+          <div class="mini-activity-meta">Sáb · 08:00 · Ciclovia Pinheiros</div>
+        </div>
+        <div class="mini-activity-stat">
+          <div class="value">22.5</div>
+          <div class="unit">km</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchScreen('feed', this)">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Feed</span>
+    </div>
+    <div class="nav-item" onclick="switchScreen('health', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <span>Saúde</span>
+    </div>
+    <div class="nav-item-record" onclick="switchScreen('record', document.querySelector('.nav-item.active'))">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+    </div>
+    <div class="nav-item" onclick="switchScreen('events', this)">
+      <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      <span>Eventos</span>
+    </div>
+    <div class="nav-item" onclick="switchScreen('profile', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span>Perfil</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchScreen(screenId, navItem) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Deactivate all nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // Show target screen
+  document.getElementById('screen-' + screenId).classList.add('active');
+  // Activate nav item
+  if (navItem && navItem.classList.contains('nav-item')) {
+    navItem.classList.add('active');
+  }
+}
+
+let isRecording = false;
+let timer = null;
+let seconds = 0;
+
+function toggleRecording() {
+  const btn = document.getElementById('btn-start');
+  const stats = document.querySelectorAll('.record-live-stat .value');
+  isRecording = !isRecording;
+
+  if (isRecording) {
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" fill="white" rx="2"/></svg>';
+    btn.style.background = 'linear-gradient(135deg, #FF4757, #FF6B81)';
+    btn.style.boxShadow = '0 4px 30px rgba(255,71,87,0.5)';
+
+    let dist = 0;
+    timer = setInterval(() => {
+      seconds++;
+      dist += 0.003 + Math.random() * 0.002;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      stats[0].textContent = dist.toFixed(2);
+      stats[1].textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+      if (dist > 0.05) {
+        const paceTotal = seconds / dist;
+        const paceMins = Math.floor(paceTotal / 60);
+        const paceSecs = Math.floor(paceTotal % 60);
+        stats[2].textContent = paceMins + "'" + (paceSecs < 10 ? '0' : '') + paceSecs + '"';
+      }
+    }, 1000);
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="white"/></svg>';
+    btn.style.background = 'var(--gradient-primary)';
+    btn.style.boxShadow = '0 4px 30px rgba(255,77,0,0.5)';
+    clearInterval(timer);
+    seconds = 0;
+  }
+}
+</script>
+</body>
+</html>
